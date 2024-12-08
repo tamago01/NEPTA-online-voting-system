@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+  
+    "strictPropertyInitialization": false,
     // Treat files as modules even if it doesn't use import/export
     "moduleDetection": "force",
 

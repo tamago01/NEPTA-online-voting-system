@@ -1,16 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const { Schema } = mongoose;
+interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+}
 
-// const userOtpSchema = new Schema({
-//   otp: { type: Number, required: true },
-//   createdAt: { type: Date, default: Date.now },
-//   email: { type: String, required: true, unique: true, maxlength: 255 },
-// });
-
-const usersSchema = new Schema({
-  name: { type: String, maxlength: 255 },
-  email: { type: String, required: true, unique: true, maxlength: 255 },
-  number: { type: String, required: true, unique: true, maxlength: 50 },
+const UserSchema: Schema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  password: { type: String, required: true },
 });
-export const UsersModel = mongoose.model("Users", usersSchema);
+
+export const User = mongoose.model<IUser>("User", UserSchema);
