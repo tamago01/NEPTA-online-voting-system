@@ -5,12 +5,11 @@ export const metadata: Metadata = {
   title: "NEPTA Voting System",
   description: "Let's Vote Online!!!",
 };
-
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className="bg-slate-100 ">{children}</body>

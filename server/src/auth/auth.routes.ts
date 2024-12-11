@@ -15,6 +15,8 @@ class AuthRoutes {
   private initializeRoutes(): void {
     this.router.post("/register", this.authController.register);
     this.router.post("/login", this.authController.login);
+    this.router.post("/logout", this.authController.logout);
+    this.router.get("/users", authMiddleware, this.authController.getUser);
   }
   public getRouter(): Router {
     return this.router;

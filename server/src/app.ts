@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import mongodbConnection from "./config/db";
 import cors from "cors";
 import authRoutes from "./auth/auth.routes";
+import cookieParser from "cookie-parser";
 
 export class App {
   public app: Application;
@@ -18,8 +19,16 @@ export class App {
   }
   private setMiddlewares(): void {
     this.app.use(express.json());
-    this.app.use(cors());
-    this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(
+      cors({
+        origin: "http://localhost:3000",
+        credentials: true,
+      })
+    );
+    this.app.options("*", cors());
+
+     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(cookieParser());
   }
   private setRoutes(): void {
     this.app.get("/", (req: Request, res: Response) => {

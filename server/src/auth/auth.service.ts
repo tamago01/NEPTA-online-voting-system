@@ -4,6 +4,20 @@ import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
 
 export class AuthService {
+  public async getUser(id: string) {
+    try {
+      const user = await User.findOne({ id });
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      return user;
+    } catch (error) {
+      console.error("Error in getUser method:", error);
+      throw error;
+    }
+  }
+
   async register(name: string, email: string, password: string) {
     try {
       const existingUser = await User.findOne({ email });
@@ -12,9 +26,12 @@ export class AuthService {
         throw new Error("User already exists");
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const newUser = new User({ name, email, password: hashedPassword });
+      const newUser = new User({
+        name,
+        email,
+        password,
+        isAdmin: false,
+      });
 
       await newUser.save();
 
@@ -22,6 +39,7 @@ export class AuthService {
         id: (newUser._id as Types.ObjectId).toString(),
         name: newUser.name,
         email: newUser.email,
+        isAdmin: newUser.isAdmin,
       };
     } catch (error) {
       console.error("Error in register method:", error);
@@ -40,14 +58,11 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new Error("Invalid credentials");
     }
-    const token = this.generateAccessToken(
-      (user._id as Types.ObjectId).toString()
-    );
+
     return {
       id: (user._id as Types.ObjectId).toString(),
       name: user.name,
       email: user.email,
-      token,
     };
   }
   public generateAccessToken(id: string): string {

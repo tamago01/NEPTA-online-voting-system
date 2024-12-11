@@ -1,10 +1,21 @@
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
+import { asyncWrapper } from "../utils/wrapper";
 
 export class AuthController {
-  public authService = new AuthService();
+  private authService = new AuthService();
 
-  register = async (req: Request, res: Response) => {
+  public getUser = asyncWrapper(async (req: Request, res: Response) => {
+    const user = req?.user;
+    console.log("data", user);
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    res.status(200).json({ user });
+  });
+
+  public register = asyncWrapper(async (req: Request, res: Response) => {
     try {
       const { name, email, password } = req.body;
 
@@ -21,17 +32,12 @@ export class AuthController {
       }
       res.status(500).json({ message: "Server error" });
     }
-  };
+  });
 
-  login = async (req: Request, res: Response) => {
+  public login = asyncWrapper(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+
     try {
-      if (req.user) {
-        return res.json({
-          message: "User already logged in",
-          user: req.user,
-        });
-      }
-      const { email, password } = req.body;
       if (!email || !password) {
         return res
           .status(400)
@@ -39,13 +45,23 @@ export class AuthController {
       }
 
       const user = await this.authService.login(email, password);
+
+      const token = this.authService.generateAccessToken(user.id);
+      res.cookie("auth-token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      });
+
       res.json({
         message: "Login successful",
+
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
-          token: user.token,
+          token,
         },
       });
     } catch (error) {
@@ -54,20 +70,19 @@ export class AuthController {
       }
       res.status(500).json({ message: "Server error" });
     }
-  };
-  // Add this method to your existing AuthController
-  verifyToken = async (req: Request, res: Response) => {
+  });
+
+  public logout = asyncWrapper(async (req: Request, res: Response) => {
     try {
-      // This route will be protected by the authMiddleware
-      // If the middleware passes, it means the token is valid
-      res.json({
-        message: "Token is valid",
-        user: {
-          id: req.user?.id,
-        },
+      res.clearCookie("auth-token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
       });
+
+      res.status(200).json({ message: "Logout successful" });
     } catch (error) {
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: "Server error during logout" });
     }
-  };
+  });
 }
