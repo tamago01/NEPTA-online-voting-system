@@ -8,17 +8,19 @@ interface TimerContextType {
   isTimerActive: boolean;
   timerValue: number;
   startTimer: () => void;
+  showBackdrop: boolean;
 }
 
 const TimerContext = createContext<TimerContextType>({
   isTimerActive: false,
-  timerValue: 1800,
+  timerValue: 10,
   startTimer: () => {},
+  showBackdrop: true,
 });
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [isTimerActive, setIsTimerActive] = useState(false);
-  const [timerValue, setTimerValue] = useState(1800);
+  const [timerValue, setTimerValue] = useState(10);
   const [showBackdrop, setShowBackdrop] = useState(true);
 
   const startTimer = () => {
@@ -27,22 +29,33 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    let timerInterval: any;
+    let timerInterval: NodeJS.Timeout;
 
     if (isTimerActive) {
       timerInterval = setInterval(() => {
-        setTimerValue((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    } else {
-      clearInterval(timerInterval);
-      setShowBackdrop(false);
-    }
+        setTimerValue((prevValue) => {
+          const newValue = prevValue > 0 ? prevValue - 1 : 0;
+          if (newValue === 0) {
+            clearInterval(timerInterval);
+            setIsTimerActive(false);
+            setShowBackdrop(false);
+          }
 
-    return () => clearInterval(timerInterval);
+          return newValue;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+    };
   }, [isTimerActive]);
 
   return (
-    <TimerContext.Provider value={{ isTimerActive, timerValue, startTimer }}>
+    <TimerContext.Provider
+      value={{ isTimerActive, timerValue, startTimer, showBackdrop }}
+    >
       {children}
     </TimerContext.Provider>
   );

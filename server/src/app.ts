@@ -3,6 +3,7 @@ import mongodbConnection from "./config/db";
 import cors from "cors";
 import authRoutes from "./auth/auth.routes";
 import cookieParser from "cookie-parser";
+import votesRoutes from "./votes/votes.routes";
 
 export class App {
   public app: Application;
@@ -27,7 +28,7 @@ export class App {
     );
     this.app.options("*", cors());
 
-     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
   }
   private setRoutes(): void {
@@ -35,6 +36,7 @@ export class App {
       res.json({ message: "Server is running!" });
     });
     this.app.use("/auth", authRoutes);
+    this.app.use("/votes", votesRoutes);
 
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {

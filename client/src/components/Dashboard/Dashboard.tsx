@@ -3,6 +3,8 @@ import Image from "next/image";
 import React, { useState } from "react";
 import OtpModal from "../Otp/OtpModal";
 import { useTimer } from "@/app/layout";
+import { useAuth } from "@/hooks/useAuth";
+import { useHandleVotes } from "@/hooks/useHandleVotes";
 
 type CandidateCategories = {
   president: string;
@@ -20,7 +22,10 @@ type CandidateCategories = {
 };
 
 const Dashboard = () => {
-  const { isTimerActive, timerValue, startTimer } = useTimer();
+  const { timerValue, startTimer, showBackdrop } = useTimer();
+  const { user } = useAuth();
+  const { postVote } = useHandleVotes();
+
   const [selectedCandidates, setSelectedCandidates] = useState({
     president: "",
     vicePresident: "",
@@ -43,7 +48,9 @@ const Dashboard = () => {
     setSelectedCandidates((prev) => ({ ...prev, [category]: candidate }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await postVote(selectedCandidates);
     console.log("Selected Candidates:", selectedCandidates);
     setIsModalOpen(true);
   };
@@ -92,16 +99,26 @@ const Dashboard = () => {
   };
   return (
     <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
-      {!isTimerActive && (
+      {!showBackdrop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-          <div className="text-center text-white">
-            <h1 className="text-3xl font-bold mb-4">
-              {" "}
-              <button onClick={startTimer}>test</button>
-              Vote starts in {formatTime(timerValue)}
-            </h1>
-            <p className="text-lg">Please wait...</p>
-          </div>
+          {timerValue > 0 ? (
+            <div className="text-center text-white">
+              <h1 className="text-3xl font-bold mb-4">
+                {user?.email === "admin@gmail.com" && (
+                  <button
+                    onClick={startTimer}
+                    className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded mb-4"
+                  >
+                    Start Vote
+                  </button>
+                )}
+              </h1>
+              <div>Vote starts in {formatTime(timerValue)}</div>
+              <p className="text-lg">Please wait...</p>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       )}
       <>

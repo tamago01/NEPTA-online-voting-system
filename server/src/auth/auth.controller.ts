@@ -18,7 +18,7 @@ export class AuthController {
   public register = asyncWrapper(async (req: Request, res: Response) => {
     try {
       const { name, email, password } = req.body;
-
+     
       if (!name || !email || !password) {
         return res.status(400).json({ message: "All fields are required" });
       }
@@ -36,7 +36,7 @@ export class AuthController {
 
   public login = asyncWrapper(async (req: Request, res: Response) => {
     const { email, password } = req.body;
-
+    console.log("user", email, password);
     try {
       if (!email || !password) {
         return res
