@@ -50,55 +50,69 @@ const AdminDashboard = () => {
           <TabsList className="ml-10">
             <TabsTrigger
               className="px-14 py-3 data-[state=active]:bg-green-400"
-              value="Results"
+              value="LiveCount"
             >
               Results
             </TabsTrigger>
             <TabsTrigger
               className="px-14 py-3 data-[state=active]:bg-green-400"
-              value="LiveCount"
+              value="Results"
             >
               Live Count
             </TabsTrigger>
           </TabsList>
 
-          {/* Results Tab */}
           <TabsContent value="Results">
             {loading ? (
               <p>Loading...</p>
             ) : error ? (
               <p>{error}</p>
             ) : (
-              results?.map((category) => (
-                <div key={category._id} className="m-10">
-                  <h3 className="mb-4 text-[20px] font-bold capitalize text-gray-700 border-b pb-2">
-                    {category._id.replace(/([A-Z])/g, " $1").trim()}
-                  </h3>
-                  <div className="flex flex-col gap-2">
-                    {category.candidates.map((candidate) => (
-                      <div
-                        key={candidate.name}
-                        className={`flex justify-between items-center border-b py-2`}
-                      >
-                        <span className="text-[18px] font-semibold text-gray-700">
-                          {candidate.name}
-                        </span>
-                        <span className="text-[18px] text-gray-900">
-                          {candidate.voteCount} votes
-                        </span>
-                      </div>
-                    ))}
+              results?.map((category) => {
+                const highestVote = Math.max(
+                  ...category.candidates.map((candidate) => candidate.voteCount)
+                );
+
+                return (
+                  <div key={category._id} className="m-10">
+                    <h3 className="mb-4 text-[20px] font-bold capitalize text-gray-700 border-b pb-2">
+                      {category._id.replace(/([A-Z])/g, " $1").trim()}
+                    </h3>
+                    <div className="flex flex-col gap-2">
+                      {category.candidates.map((candidate) => (
+                        <div
+                          key={candidate.name}
+                          className={`flex justify-between items-center border-b py-2 ${
+                            candidate.voteCount === highestVote
+                              ? "bg-red-200"
+                              : ""
+                          }`}
+                        >
+                          <span className="text-[18px] font-semibold text-gray-700">
+                            {candidate.name}
+                          </span>
+                          <span
+                            className={`text-[18px] ${
+                              candidate.voteCount === highestVote
+                                ? "text-red-600 font-bold"
+                                : "text-gray-900"
+                            }`}
+                          >
+                            {candidate.voteCount} votes
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </TabsContent>
 
-          {/* Placeholder for Live Count */}
           <TabsContent value="LiveCount">
             <div className="p-10">
               <h3 className="text-[20px] font-bold capitalize text-gray-700">
-                Live Count Coming Soon...
+                Results Coming Soon...
               </h3>
             </div>
           </TabsContent>
