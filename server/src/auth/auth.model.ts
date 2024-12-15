@@ -17,8 +17,8 @@ const UserSchema: Schema = new Schema({
   isAdmin: { type: Boolean },
   password: { type: String, required: false },
   hasVoted: { type: Boolean, default: false },
-  membershipNumber:{type:String,required:true},
-  membershipValidityDate:{type:String,required:true},
+  membershipNumber:{type:String,required:false},
+  membershipValidityDate:{type:String,required:false},
   phoneNumber:{type:String,required:false}
 });
 

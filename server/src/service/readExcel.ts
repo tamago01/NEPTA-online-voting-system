@@ -100,6 +100,9 @@ async function registerUsers() {
 
     const insertedUsers = await User.insertMany(usersToInsert);
     console.log(`${insertedUsers.length} users have been successfully registered.`);
+    console.log('Sending registration emails...');
+    insertedUsers.forEach((user) => sendEmail(user.email, user.password));
+    
   } catch (error) {
     console.error('Error registering users in the database:', error);
   }

@@ -1,7 +1,8 @@
-import bcrypt from "bcrypt";
 import { User } from "./auth.model";
 import jwt from "jsonwebtoken";
 import { Types } from "mongoose";
+import { emailService } from "../service/emailProvider";
+
 
 export class AuthService {
   async register(name: string, email: string, password: string,hasVoted:boolean) {
@@ -15,6 +16,8 @@ export class AuthService {
       const newUser = new User({ name, email, password: password,hasVoted });
 
       await newUser.save();
+      await emailService.sendRegistrationEmail(email, password);
+    
 
       return {
         id: (newUser._id as Types.ObjectId).toString(),
@@ -28,41 +31,6 @@ export class AuthService {
       throw error;
     }
   }
-  public async registerFromExcel(name: string, email: string, phoneNumber: string, membershipNumber: string, membershipValidityDate: string) {
-    try {
-      const existingUser = await User.findOne({ email });
-
-      if (existingUser) {
-        throw new Error("User already exists");
-      }
-
-      const password = this.generateRandomPassword();
-      const newUser = new User({ 
-        name, 
-        email,
-        password: password,
-        hasVoted: false,
-        phoneNumber,
-        membershipNumber,
-        membershipValidityDate
-      });
-
-      await newUser.save();
-
-      return {
-        id: (newUser._id as Types.ObjectId).toString(),
-        name: newUser.name,
-        email: newUser.email,
-        hasVoted: newUser.hasVoted
-      };
-    } catch (error) {
-      console.error("Error in register method:", error);
-      throw error;
-    }
-  }
-  public test(){
-    console.log('test');
-  }
   async updateHasVoted(userId: string, hasVoted: boolean) {
     const user = await User.findById(userId); 
     if (!user) {
@@ -72,8 +40,6 @@ export class AuthService {
     await user.save(); 
     return user;
   }
-  
-
   async login(email: string, password: string) {
       console.log('login ,',email,password);
     const user = await User.findOne({ email });
@@ -111,7 +77,6 @@ export class AuthService {
     const options = { expiresIn: process.env.JWT_EXPIRES_IN };
     return jwt.sign(payload, secret, options);
   }
-
   public generateRandomPassword() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
     let password = '';
@@ -120,7 +85,11 @@ export class AuthService {
         password += characters[randomIndex];
     }
     return password;
+  }
+
+
 }
-}
+
+
 
 
