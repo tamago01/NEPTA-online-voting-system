@@ -15,6 +15,7 @@ class AuthRoutes {
   private initializeRoutes(): void {
     this.router.post("/register", this.authController.register);
     this.router.post("/login", this.authController.login);
+    this.router.patch("/:userId/hasVoted", this.authController.updateHasVoted);
   }
   public getRouter(): Router {
     return this.router;
