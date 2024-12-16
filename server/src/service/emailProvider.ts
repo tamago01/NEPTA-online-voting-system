@@ -52,6 +52,35 @@ Your Team`,
     }
   }
 
+    /**
+   * Sends an OTP email
+   * @param email Recipient's email address
+   * @param otp The OTP to send
+   */
+  async sendOtpEmail(email: string, otp: string): Promise<void> {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your OTP Code',
+      text: `Hello,
+
+Your OTP code is: ${otp}
+
+Please use this code to complete your verification.
+
+Best regards,
+NEPTA`,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`OTP email sent to ${email}`);
+    } catch (error) {
+      console.error(`Error sending OTP email to ${email}:`, error);
+      throw error; // Rethrow to allow caller to handle
+    }
+  }
+
 }
 
 // Export a singleton instance

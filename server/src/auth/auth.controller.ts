@@ -49,7 +49,7 @@ export class AuthController {
 
       const user = await this.authService.login(email, password);
 
-      const token = this.authService.generateAccessToken(user.id);
+      const token = this.authService.generateAccessToken(user.id, user.email);
       res.cookie("auth-token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",

@@ -74,7 +74,9 @@ export class AuthService {
     console.log('user._id',user._id);
     
     const token = this.generateAccessToken(
-      (user._id as Types.ObjectId).toString()
+      (user._id as Types.ObjectId).toString(),
+      user.email
+
     );
     console.log('token',token);
 
@@ -86,10 +88,10 @@ export class AuthService {
       token,
     };
   }
-  public generateAccessToken(id: string): string {
+  public generateAccessToken(id: string,email:string): string {
     console.log('generateAccessToken',id);
     
-    const payload = { id };
+    const payload = { id,email };
     const secret = process.env.JWT_SECRET;
     const options = { expiresIn: process.env.JWT_EXPIRES_IN };
     return jwt.sign(payload, secret, options);

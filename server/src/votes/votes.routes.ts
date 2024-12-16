@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authMiddleware } from "../middleware/authMiddleware";
 import { VotesController } from "./votes.controller";
 
 class VotesRoutes {
@@ -12,8 +13,11 @@ class VotesRoutes {
   }
 
   private initializeRoutes(): void {
-    this.router.post("/post-votes", this.votesController.postVote);
+    this.router.post("/post-votes",authMiddleware,this.votesController.postVote);
     this.router.get("/get-results", this.votesController.getResults);
+    this.router.post("/send-otp",  this.votesController.sendOtp);
+    this.router.post("/verify-otp", this.votesController.verifyOtp);
+    
   }
   public getRouter(): Router {
     return this.router;
