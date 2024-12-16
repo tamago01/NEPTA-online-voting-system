@@ -9,6 +9,7 @@ interface IUser extends Document {
   membershipNumber:string;
   membershipValidityDate:string;
   phoneNumber:string;
+  otp:string;
 }
 
 const UserSchema: Schema = new Schema({
@@ -19,7 +20,8 @@ const UserSchema: Schema = new Schema({
   hasVoted: { type: Boolean, default: false },
   membershipNumber:{type:String,required:false},
   membershipValidityDate:{type:String,required:false},
-  phoneNumber:{type:String,required:false}
+  phoneNumber:{type:String,required:false},
+  otp:{type:String,required:false,default:""}
 });
 
 export const User = mongoose.model<IUser>("User", UserSchema);

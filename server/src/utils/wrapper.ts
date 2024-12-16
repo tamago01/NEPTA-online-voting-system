@@ -5,7 +5,7 @@ export const asyncWrapper = (handler: RequestHandler) => {
     try {
       await handler(req, res, next);
     } catch (error: any) {
-      next(error); // Pass any caught errors to Express error handler
+      next(error); 
     }
   };
 };
