@@ -1,5 +1,6 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -17,7 +18,7 @@ const Login = () => {
   return (
     <div className="relative h-screen flex items-center justify-center w-full">
       <div className="absolute inset-0 w-full">
-        <img
+        <Image
           src="https://img.freepik.com/premium-photo/engaged-audience-financial-seminar-group-image_853163-18959.jpg"
           alt="Voters"
           width={800}

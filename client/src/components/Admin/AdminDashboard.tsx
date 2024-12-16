@@ -36,6 +36,7 @@ const AdminDashboard = () => {
     };
 
     fetchResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -5,7 +5,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const Header = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);

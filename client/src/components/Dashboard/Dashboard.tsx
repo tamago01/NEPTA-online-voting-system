@@ -5,6 +5,7 @@ import OtpModal from "../Otp/OtpModal";
 import { useTimer } from "@/app/layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useHandleVotes } from "@/hooks/useHandleVotes";
+import { candidatePhotos } from "../Constants/Photos";
 
 type CandidateCategories = {
   president: string;
@@ -41,6 +42,46 @@ const Dashboard = () => {
     NationalCommitteeMember: "",
   });
 
+  // const candidatePhotoMap = {
+  //   Shamed: shamed,
+  //   Shyam: shyam,
+  //   Binaya: "/images/binaya.jpg",
+  //   Manju: manju,
+  //   Subarna: "/images/subarna.jpg",
+  //   Bibek: "/images/bibek.jpg",
+  //   Jyanendra: "/images/jyanendra.jpg",
+  //   Sujityadav: "/images/sujityadav.jpg",
+  //   Sujeet: "/images/sujeet.jpg",
+  //   Om: "/images/om.jpg",
+  //   Ekina: "/images/ekina.jpg",
+  //   Ujjwal: "/images/ujjwal.jpg",
+  //   UmaShankar: "/images/umashankar.jpg",
+  //   Saugat: "/images/saugat.jpg",
+  //   Aashish: "/images/ashish.jpg",
+  //   Anup: "/images/anup.jpg",
+  //   Bijaya: "/images/bijaya.jpg",
+  //   Dhiraj: "/images/dhiraj.jpg",
+  //   Shaj: "/images/shaj.jpg",
+  //   Sudip: "/images/sudip.jpg",
+  //   Tenzing: "/images/tenzing.jpg",
+  //   Srijana: "/images/srijana.jpg",
+  //   NabinJaiswal: "/images/nabinj.png",
+  //   Kaushal: "/images/kaushal.jpg",
+  //   Abhinash: "/images/abhinash.jpeg",
+  //   NabinSapkota: "/images/nabinsapkota.jpeg",
+  //   Dildip: "/images/dildip.jpg",
+  //   Jayaram: "/images/jayaram.jpg",
+  //   Sakuna: "/images/sakuna.jpeg",
+  //   SujitJha: "/images/sujitjha.jpeg",
+  // };
+  // const getCandidatePhoto = (name: string) => {
+  //   return "/images/sujitjha.jpg"; // temporary test
+  // };
+  // const getCandidatePhoto = (name: string) => {
+  //   const firstName = name.split(" ")[0];
+  //   return candidatePhotoMap[firstName];
+  // };
+
   const handleSelect = (
     category: keyof CandidateCategories,
     candidate: string
@@ -51,7 +92,6 @@ const Dashboard = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await postVote(selectedCandidates);
-    console.log("Selected Candidates:", selectedCandidates);
     setIsModalOpen(true);
   };
 
@@ -61,7 +101,7 @@ const Dashboard = () => {
     vicePresidentFemale: ["Manju Gyawali"],
     SecretaryGeneral: ["Subarna Thapa Chhetri"],
     Secretary: ["Bibek Ghimire", "Jyanendra Jha"],
-    Treasurer: ["Sujit Kumar Yadav", "Sujit Singh"],
+    Treasurer: ["Sujit Kumar Yadav", "Sujeet Singh"],
     CoTreasurer: ["Om Prakash Shah", "Ekina Khadka"],
     CommitteeMemberOpen: [
       "Ujjwal Dotel",
@@ -104,7 +144,7 @@ const Dashboard = () => {
           {timerValue > 0 ? (
             <div className="text-center text-white">
               <h1 className="text-3xl font-bold mb-4">
-                {user?.email === "admin@gmail.com" && (
+                {user?.email === "tamangjake@gmail.com" && (
                   <button
                     onClick={startTimer}
                     className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded mb-4"
@@ -162,19 +202,27 @@ const Dashboard = () => {
                     }
                     className="w-5 h-5"
                   />
+                  {/* {candidatePhotos?.map((item: any, index: number) => ( */}
+                  <Image
+                    priority
+                    src={
+                      candidatePhotos[name.split(" ")[0]] || "/images/user.png"
+                    }
+                    alt={name}
+                    unoptimized={false}
+                    width={600}
+                    height={600}
+                    className="h-48 w-48 rounded-full object-cover"
+                    // onError={(e) => {
+                    //   (e.target as HTMLImageElement).src = "/images/user.png";
+                    // }}
+                  />
+                  {/* ))} */}
                   <div className="lg:flex items-center gap-4">
-                    <Image
-                      src="/images/user.png"
-                      alt="user"
-                      width={200}
-                      height={200}
-                      className="h-16 w-16 rounded-full object-contain"
-                    />
                     <div>
                       <p className="text-[20px] font-semibold text-gray-800">
                         {name}
                       </p>
-                      <p className="text-gray-600">Description about {name}</p>
                     </div>
                   </div>
                 </label>

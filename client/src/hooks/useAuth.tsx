@@ -37,17 +37,16 @@ export function useAuth() {
           const userData = await response.json();
           setUser(userData);
         }
-        console.log("users", user);
       } catch (err) {
         console.error("Failed to fetch user:", err);
       }
     };
 
     fetchUser();
-  }, [user]);
+  }, []);
 
   //register
-  const register = async (data: RegisterData) => {
+  async function register(data: RegisterData) {
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -78,7 +77,7 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const login = async (email: string, password: string) => {
     setLoading(true);

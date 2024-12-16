@@ -41,7 +41,7 @@ export default function Home() {
             </nav>
           </div>
           <div className="relative mx-auto w-full h-screen">
-            <img
+            <Image
               src="https://img.freepik.com/premium-photo/engaged-audience-financial-seminar-group-image_853163-18959.jpg"
               alt="Voters"
               width={1200}
