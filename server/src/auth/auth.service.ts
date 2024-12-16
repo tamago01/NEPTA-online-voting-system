@@ -11,7 +11,10 @@ export class AuthService {
         throw new Error("User not found");
       }
 
-      return user;
+      return {
+        id: user.id,
+        email: user.email,
+      };
     } catch (error) {
       console.error("Error in getUser method:", error);
       throw error;

@@ -12,7 +12,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="w-full flex justify-between mx-auto border-b py-4 px-8">
+      <div className="w-full flex justify-between mx-auto border-b py-3 px-8 bg-gradient-to-r from-white via-green-100 to-green-300 shadow-sm">
         <Link href="/" className="ml-10">
           <Image
             src="/images/nepta.png"

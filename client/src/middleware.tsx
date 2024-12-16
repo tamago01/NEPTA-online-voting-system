@@ -3,7 +3,7 @@ import { verifyToken } from "../lib/auth";
 
 export const config = {
   runtime: "nodejs",
-  matcher: ["/((?!_next|api|favicon.ico).*)"],
+  matcher: ["/((?!_next|api|favicon.ico).*)", "/dashboard"],
 };
 
 export function middleware(req: NextRequest) {
@@ -13,12 +13,10 @@ export function middleware(req: NextRequest) {
 
   const publicPaths = ["/", "/login", "/register"];
   if (publicPaths.includes(req.nextUrl.pathname)) {
-   
     return NextResponse.next();
   }
 
   if (!token) {
-   
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

@@ -13,7 +13,6 @@ const OtpModal = ({ isOpen, onClose }: OtpModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("OTP Entered:", otp);
-    alert(`OTP Submitted: ${otp}`);
     onClose();
   };
 
