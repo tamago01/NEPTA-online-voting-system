@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [results, setResults] = useState<CategoryData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(false);
 
   const { getResults } = useHandleVotes();
 
@@ -39,6 +40,33 @@ const AdminDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const gatherWinnersData = () => {
+    return results.map((category) => {
+      const sortedCandidates = category.candidates.sort(
+        (a, b) => b.voteCount - a.voteCount
+      );
+      const winner = sortedCandidates[0];
+      return {
+        category: category._id.replace(/([A-Z])/g, " $1").trim(),
+        winnerName: winner.name,
+        votes: winner.voteCount,
+      };
+    });
+  };
+  const handlePublish = () => {
+    setLoading(true);
+    const winnersData = gatherWinnersData();
+
+    try {
+      localStorage.setItem("winnersSnapshot", JSON.stringify(winnersData));
+      setIsPublished(true);
+    } catch (err) {
+      console.error("Failed to publish snapshot", err);
+      setIsPublished(false);
+    }
+    setLoading(false);
+  };
+
   return (
     <div>
       <Header />
@@ -51,29 +79,30 @@ const AdminDashboard = () => {
           <TabsList className="ml-10">
             <TabsTrigger
               className="px-14 py-3 data-[state=active]:bg-green-400"
-              value="LiveCount"
+              value="Results"
             >
               Results
             </TabsTrigger>
             <TabsTrigger
               className="px-14 py-3 data-[state=active]:bg-green-400"
-              value="Results"
+              value="LiveCount"
             >
               Live Count
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="Results">
+          <TabsContent value="LiveCount">
             {loading ? (
               <p>Loading...</p>
             ) : error ? (
               <p>{error}</p>
             ) : (
               results?.map((category) => {
-                const highestVote = Math.max(
-                  ...category.candidates.map((candidate) => candidate.voteCount)
+                const sortedCandidates = category.candidates.sort(
+                  (a, b) => b.voteCount - a.voteCount
                 );
 
+                const highestVote = sortedCandidates[0]?.voteCount;
                 return (
                   <div key={category._id} className="m-10">
                     <h3 className="mb-4 text-[20px] font-bold capitalize text-gray-700 border-b pb-2">
@@ -83,9 +112,9 @@ const AdminDashboard = () => {
                       {category.candidates.map((candidate) => (
                         <div
                           key={candidate.name}
-                          className={`flex justify-between items-center border-b py-2 ${
+                          className={`flex justify-between items-center border-b py-2 px-6 rounded-lg ${
                             candidate.voteCount === highestVote
-                              ? "bg-red-200"
+                              ? "bg-green-200"
                               : ""
                           }`}
                         >
@@ -110,12 +139,53 @@ const AdminDashboard = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="LiveCount">
-            <div className="p-10">
-              <h3 className="text-[20px] font-bold capitalize text-gray-700">
-                Results Coming Soon...
-              </h3>
-            </div>
+          <TabsContent value="Results">
+            {loading ? (
+              <p>Loading...</p>
+            ) : error ? (
+              <p>{error}</p>
+            ) : (
+              <div className="m-10 bg-gray-100 rounded-lg p-5 shadow-md">
+                <h3 className="mb-4 text-[20px] font-bold capitalize text-gray-700">
+                  Winners Across All Categories
+                </h3>
+
+                {results.map((category) => {
+                  const sortedCandidates = category.candidates.sort(
+                    (a, b) => b.voteCount - a.voteCount
+                  );
+                  const winner = sortedCandidates[0];
+
+                  return (
+                    <div
+                      key={category._id}
+                      className="flex justify-between items-center mt-2  border-b border-black px-6 py-4"
+                    >
+                      <span className="font-semibold text-gray-800 text-[18px]">
+                        {category._id.replace(/([A-Z])/g, " $1").trim()}:{" "}
+                        <div> {winner.name} </div>
+                      </span>
+
+                      <span className="font-bold text-red-600 text-[18px]">
+                        {winner.voteCount} votes
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {isPublished ? (
+              <p className="p-4 ml-10 my-10 border w-max bg-green-200 cursor-disabled rounded-lg text-green-500 font-bold">
+                📤 Data Sent Successfully!
+              </p>
+            ) : (
+              <div
+                onClick={handlePublish}
+                className="bg-green-200 w-max ml-10 my-10 cursor-pointer rounded-lg p-4 mt-10 text-center"
+              >
+                <span className="font-semibold">Publish </span>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

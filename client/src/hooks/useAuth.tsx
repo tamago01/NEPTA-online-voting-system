@@ -23,25 +23,29 @@ export function useAuth() {
   const [success, setSuccess] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
+  const fetchUser = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users`,
+        {
+          credentials: "include",
         }
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-      }
-    };
+      );
 
+      if (response.ok) {
+        const data = await response.json();
+        // console.log("Fetched User Data:", data);
+
+        if (data?.user) {
+          setUser(data.user);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
+
+  useEffect(() => {
     fetchUser();
   }, []);
 

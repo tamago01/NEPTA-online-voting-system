@@ -5,7 +5,7 @@ import binaya from "../../images/binaya.jpg";
 import subarna from "../../images/subarna.jpg";
 import bibek from "../../images/bibek.jpeg";
 import jyanendra from "../../images/jyanendra.jpg";
-import sujityadav from "../../images/sujityadav.jpeg";
+import yadavsujit from "../../images/yadavsujit.png";
 import sujeetsingh from "../../images/sujeetsingh.jpg";
 import om from "../../images/om.jpg";
 import ekina from "../../images/ekina.jpeg";
@@ -27,38 +27,38 @@ import nabinsapkota from "../../images/nabinsapkota.png";
 import dildip from "../../images/dildip.jpg";
 import jayaram from "../../images/jayaram.jpg";
 import sakuna from "../../images/sakuna.jpeg";
-import sujitjha from "../../images/sujitjha.jpg";
+import jhasujit from "../../images/jhasujit.jpg";
 import { StaticImageData } from "next/image";
 
 export const candidatePhotos: Record<string, StaticImageData> = {
-  Shamed: shamed,
-  Shyam: shyam,
-  Binaya: binaya,
-  Manju: manju,
-  Subarna: subarna,
-  Bibek: bibek,
-  Jyanendra: jyanendra,
-  Sujityadav: sujityadav,
-  Sujeet: sujeetsingh,
-  Om: om,
-  Ekina: ekina,
-  Ujjwal: ujjwal,
-  UmaShankar: umashankar,
-  Saugat: saugat,
-  Aashish: ashish,
-  Anup: anup,
-  Bijaya: bijaya,
-  Dhiraj: dhiraj,
-  Shaj: shaj,
-  Sudip: sudip,
-  Tenzing: tenzing,
-  Srijana: srijana,
-  NabinJaiswal: nabinj,
-  Kaushal: kaushal,
-  Abhinash: abhinash,
-  NabinSapkota: nabinsapkota,
-  Dildip: dildip,
-  Jayaram: jayaram,
-  Sakuna: sakuna,
-  SujitJha: sujitjha,
+  "Shamed Katila Shrestha": shamed,
+  "Shyam Sundar Yadav": shyam,
+  "Binaya Kandel": binaya,
+  "Manju Gyawali": manju,
+  "Subarna Thapa Chhetri": subarna,
+  "Bibek Ghimire": bibek,
+  "Jyanendra Jha": jyanendra,
+  "Sujit Yadav": yadavsujit,
+  "Sujeet Singh": sujeetsingh,
+  "Om Prakash Shah": om,
+  "Ekina Khadka": ekina,
+  "Ujjwal Dotel": ujjwal,
+  "UmaShankar Shah": umashankar,
+  "Saugat Shrestha": saugat,
+  "Aashish Gho Shrestha": ashish,
+  "Anup Acharya": anup,
+  "Bijaya Shrestha": bijaya,
+  "Dhiraj Shrestha": dhiraj,
+  "Shaj Shrestha": shaj,
+  "Sudip Dhital": sudip,
+  "Tenzing Norbu Lama": tenzing,
+  "Srijana Luitel": srijana,
+  "Nabin Kumar Jaiswal": nabinj,
+  "Kaushal Das": kaushal,
+  "Abhinash Lamsal": abhinash,
+  "Nabin Sapkota": nabinsapkota,
+  "Dildip Khanal": dildip,
+  "Jayaram Maharjan": jayaram,
+  "Sakuna Dani": sakuna,
+  "Sujit Jha": jhasujit,
 };

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OtpModal from "../Otp/OtpModal";
 import { useTimer } from "@/app/layout";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,9 +8,9 @@ import { useHandleVotes } from "@/hooks/useHandleVotes";
 import { candidatePhotos } from "../Constants/Photos";
 
 type CandidateCategories = {
-  president: string;
-  vicePresident: string;
-  vicePresidentFemale: string;
+  President: string;
+  VicePresident: string;
+  VicePresidentFemale: string;
   SecretaryGeneral: string;
   Secretary: string;
   Treasurer: string;
@@ -25,12 +25,15 @@ type CandidateCategories = {
 const Dashboard = () => {
   const { timerValue, startTimer, showBackdrop } = useTimer();
   const { user } = useAuth();
+  console.log("us", user?.email);
   const { postVote } = useHandleVotes();
 
-  const [selectedCandidates, setSelectedCandidates] = useState({
-    president: "",
-    vicePresident: "",
-    vicePresidentFemale: "",
+  const [selectedCandidates, setSelectedCandidates] = useState<{
+    [key in keyof CandidateCategories]: string;
+  }>({
+    President: "",
+    VicePresident: "",
+    VicePresidentFemale: "",
     SecretaryGeneral: "",
     Secretary: "",
     Treasurer: "",
@@ -41,67 +44,48 @@ const Dashboard = () => {
     CommitteeMemberJanajati: "",
     NationalCommitteeMember: "",
   });
+  useEffect(() => {
+    const newSelectedCandidates = { ...selectedCandidates };
 
-  // const candidatePhotoMap = {
-  //   Shamed: shamed,
-  //   Shyam: shyam,
-  //   Binaya: "/images/binaya.jpg",
-  //   Manju: manju,
-  //   Subarna: "/images/subarna.jpg",
-  //   Bibek: "/images/bibek.jpg",
-  //   Jyanendra: "/images/jyanendra.jpg",
-  //   Sujityadav: "/images/sujityadav.jpg",
-  //   Sujeet: "/images/sujeet.jpg",
-  //   Om: "/images/om.jpg",
-  //   Ekina: "/images/ekina.jpg",
-  //   Ujjwal: "/images/ujjwal.jpg",
-  //   UmaShankar: "/images/umashankar.jpg",
-  //   Saugat: "/images/saugat.jpg",
-  //   Aashish: "/images/ashish.jpg",
-  //   Anup: "/images/anup.jpg",
-  //   Bijaya: "/images/bijaya.jpg",
-  //   Dhiraj: "/images/dhiraj.jpg",
-  //   Shaj: "/images/shaj.jpg",
-  //   Sudip: "/images/sudip.jpg",
-  //   Tenzing: "/images/tenzing.jpg",
-  //   Srijana: "/images/srijana.jpg",
-  //   NabinJaiswal: "/images/nabinj.png",
-  //   Kaushal: "/images/kaushal.jpg",
-  //   Abhinash: "/images/abhinash.jpeg",
-  //   NabinSapkota: "/images/nabinsapkota.jpeg",
-  //   Dildip: "/images/dildip.jpg",
-  //   Jayaram: "/images/jayaram.jpg",
-  //   Sakuna: "/images/sakuna.jpeg",
-  //   SujitJha: "/images/sujitjha.jpeg",
-  // };
-  // const getCandidatePhoto = (name: string) => {
-  //   return "/images/sujitjha.jpg"; // temporary test
-  // };
-  // const getCandidatePhoto = (name: string) => {
-  //   const firstName = name.split(" ")[0];
-  //   return candidatePhotoMap[firstName];
-  // };
+    Object.entries(candidates).forEach(([category, names]) => {
+      if (names.length === 1) {
+        newSelectedCandidates[category as keyof CandidateCategories] = names[0];
+      }
+    });
+
+    setSelectedCandidates(newSelectedCandidates);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelect = (
     category: keyof CandidateCategories,
     candidate: string
   ) => {
-    setSelectedCandidates((prev) => ({ ...prev, [category]: candidate }));
+    if (candidates[category].length > 1) {
+      setSelectedCandidates((prev) => {
+        const currentValue = prev[category];
+        return {
+          ...prev,
+          [category]: currentValue === candidate ? "" : candidate,
+        };
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await postVote(selectedCandidates);
+    console.log("selected", selectedCandidates);
     setIsModalOpen(true);
   };
 
   const candidates: Record<keyof CandidateCategories, string[]> = {
-    president: ["Shamed Katila Shrestha"],
-    vicePresident: ["Shyam Sundar Yadav", "Binaya Kandel"],
-    vicePresidentFemale: ["Manju Gyawali"],
+    President: ["Shamed Katila Shrestha"],
+    VicePresident: ["Shyam Sundar Yadav", "Binaya Kandel"],
+    VicePresidentFemale: ["Manju Gyawali"],
     SecretaryGeneral: ["Subarna Thapa Chhetri"],
     Secretary: ["Bibek Ghimire", "Jyanendra Jha"],
-    Treasurer: ["Sujit Kumar Yadav", "Sujeet Singh"],
+    Treasurer: ["Sujit Yadav", "Sujeet Singh"],
     CoTreasurer: ["Om Prakash Shah", "Ekina Khadka"],
     CommitteeMemberOpen: [
       "Ujjwal Dotel",
@@ -123,7 +107,7 @@ const Dashboard = () => {
       "Nabin Sapkota",
       "Dildip Khanal",
       "Jayaram Maharjan",
-      "Sakuna Dani ",
+      "Sakuna Dani",
       "Sujit Jha",
     ],
   };
@@ -139,8 +123,8 @@ const Dashboard = () => {
   };
   return (
     <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
-      {!showBackdrop && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      {showBackdrop && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-lg">
           {timerValue > 0 ? (
             <div className="text-center text-white">
               <h1 className="text-3xl font-bold mb-4">
@@ -170,13 +154,13 @@ const Dashboard = () => {
           Vote starts in {formatTime(timerValue)}
         </div>
         {Object.entries(candidates).map(([category, names]) => (
-          <div key={category} className="mb-10">
+          <div key={category} className="mb-10 lg:px-10">
             <div className="border-l-4 border-red-400 px-6">
               <h2 className=" mb-4 text-[24px] font-bold capitalize text-gray-700">
                 {category.replace(/([A-Z])/g, " $1").trim()}
               </h2>
             </div>
-            <div className=" grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className=" grid grid-cols-1 md:grid-cols-2 gap-4">
               {names.map((name) => (
                 <label
                   key={name}
@@ -189,7 +173,7 @@ const Dashboard = () => {
                   }`}
                 >
                   <input
-                    type="radio"
+                    type="checkbox"
                     name={category}
                     value={name}
                     checked={
@@ -200,24 +184,18 @@ const Dashboard = () => {
                     onChange={() =>
                       handleSelect(category as keyof CandidateCategories, name)
                     }
-                    className="w-5 h-5"
+                    className="w-5 h-5 cursor-pointer"
                   />
-                  {/* {candidatePhotos?.map((item: any, index: number) => ( */}
                   <Image
                     priority
-                    src={
-                      candidatePhotos[name.split(" ")[0]] || "/images/user.png"
-                    }
+                    src={candidatePhotos[name] || "/images/user.png"}
                     alt={name}
                     unoptimized={false}
                     width={600}
                     height={600}
-                    className="h-48 w-48 rounded-full object-cover"
-                    // onError={(e) => {
-                    //   (e.target as HTMLImageElement).src = "/images/user.png";
-                    // }}
+                    className="h-24 w-24 lg:h-48 lg:w-48 rounded-full object-contain"
                   />
-                  {/* ))} */}
+
                   <div className="lg:flex items-center gap-4">
                     <div>
                       <p className="text-[20px] font-semibold text-gray-800">
