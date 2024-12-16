@@ -17,6 +17,7 @@ class AuthRoutes {
     this.router.post("/login", this.authController.login);
     this.router.post("/logout", this.authController.logout);
     this.router.get("/users", authMiddleware, this.authController.getUser);
+    this.router.patch("/:userId/hasVoted", this.authController.updateHasVoted);
   }
   public getRouter(): Router {
     return this.router;

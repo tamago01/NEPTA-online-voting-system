@@ -44,7 +44,7 @@ export function useAuth() {
     };
 
     fetchUser();
-  }, []);
+  }, [user]);
 
   //register
   const register = async (data: RegisterData) => {
