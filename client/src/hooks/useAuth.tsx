@@ -34,7 +34,6 @@ export function useAuth() {
 
       if (response.ok) {
         const data = await response.json();
-        // console.log("Fetched User Data:", data);
 
         if (data?.user) {
           setUser(data.user);

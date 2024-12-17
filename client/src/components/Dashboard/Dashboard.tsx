@@ -2,10 +2,10 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import OtpModal from "../Otp/OtpModal";
-import { useTimer } from "@/app/layout";
 import { useAuth } from "@/hooks/useAuth";
 import { useHandleVotes } from "@/hooks/useHandleVotes";
 import { candidatePhotos } from "../Constants/Photos";
+import { useTimer } from "@/app/context/TimeProvider";
 
 type CandidateCategories = {
   President: string;
