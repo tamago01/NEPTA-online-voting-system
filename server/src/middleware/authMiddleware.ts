@@ -7,7 +7,7 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   try {
-    const token = req.cookies["auth-token"] || req.headers["authorization"];
+    const token = req.cookies["auth-token"] || req.header("Authorization")?.replace("Bearer ","");
 
     if (!token) {
       return res
