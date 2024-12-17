@@ -20,22 +20,23 @@ export class App {
   }
   private setMiddlewares(): void {
     this.app.use(express.json());
-    
+
     // Specify the exact origin for CORS when credentials are included
     this.app.use(
       cors({
-        origin: "https://nepta-client.vercel.app", // Specify the client origin here
-        credentials: true, // Allow credentials (cookies, headers)
+        origin: ["https://nepta-client.vercel.app", "http://localhost:3000"],
+
+        credentials: true,
       })
     );
-    
+
     // Handle preflight requests for OPTIONS
     this.app.options("*", cors());
-  
+
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
   }
-  
+
   private setRoutes(): void {
     this.app.get("/", (req: Request, res: Response) => {
       res.json({ message: "Server is running!" });
