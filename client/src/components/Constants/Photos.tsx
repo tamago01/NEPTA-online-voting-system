@@ -1,7 +1,7 @@
 import shamed from "../../images/shamed.jpeg";
 import manju from "../../images/manju.jpeg";
 import shyam from "../../images/shyam.jpg";
-import binaya from "../../images/binaya.png"
+import binaya from "../../images/binaya.png";
 import subarna from "../../images/subarna.jpg";
 import bibek from "../../images/bibek.jpeg";
 import jyanendra from "../../images/jyanendra.jpg";
@@ -29,6 +29,7 @@ import jayaram from "../../images/jayaram.jpg";
 import sakuna from "../../images/sakuna.jpeg";
 import jhasujit from "../../images/jhasujit.jpg";
 import { StaticImageData } from "next/image";
+import banner from "../../images/banner.jpg";
 
 export const candidatePhotos: Record<string, StaticImageData> = {
   "Shamed Katila Shrestha": shamed,
@@ -61,4 +62,8 @@ export const candidatePhotos: Record<string, StaticImageData> = {
   "Jayaram Maharjan": jayaram,
   "Sakuna Dani": sakuna,
   "Sujit Jha": jhasujit,
+};
+
+export const Banners: Record<string, StaticImageData> = {
+  BannerImage: banner,
 };

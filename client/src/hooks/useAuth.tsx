@@ -24,6 +24,7 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
 
   const fetchUser = async () => {
+    console.log("users", user)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users`,
@@ -82,10 +83,11 @@ export function useAuth() {
     }
   }
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, router: any) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
@@ -104,7 +106,7 @@ export function useAuth() {
       if (response.ok) {
         setSuccess(true);
         setUser(data);
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       } else {
         setError(data.message || "Login failed");
       }

@@ -74,8 +74,9 @@ const Dashboard = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await postVote(selectedCandidates);
+
     console.log("selected", selectedCandidates);
+    await postVote(selectedCandidates);
     setIsModalOpen(true);
   };
 
@@ -193,7 +194,7 @@ const Dashboard = () => {
                     unoptimized={false}
                     width={600}
                     height={600}
-                    className="h-24 w-24 lg:h-48 lg:w-48 rounded-full object-contain"
+                    className="h-24 w-24 lg:h-48 lg:w-48 rounded-full object-cover"
                   />
 
                   <div className="lg:flex items-center gap-4">

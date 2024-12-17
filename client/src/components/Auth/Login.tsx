@@ -4,16 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import banner from "../../images/banner.jpg";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const router: any = useRouter();
   const { login, loading, error, success } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
+    await login(email, password, router);
   };
 
   return (
