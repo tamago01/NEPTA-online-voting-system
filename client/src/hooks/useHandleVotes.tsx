@@ -20,7 +20,11 @@ export function useHandleVotes() {
           })
       );
 
-      await Promise.all(postRequests);
+      const res = await Promise.all(postRequests);
+      console.log(
+        "res",
+        res.map((r) => r.json())
+      );
     } catch (err) {
       console.error("Failed to post votes:", err);
       setError("Failed to post votes.");
@@ -29,7 +33,7 @@ export function useHandleVotes() {
     }
   };
 
-  const sendOtp = async (otp: string, email: string) => {
+  const sendOtp = async (email: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -41,7 +45,7 @@ export function useHandleVotes() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ otp, email }),
+          body: JSON.stringify({ email }),
         }
       );
 

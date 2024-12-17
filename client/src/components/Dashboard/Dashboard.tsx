@@ -24,9 +24,25 @@ type CandidateCategories = {
 
 const Dashboard = () => {
   const { timerValue, startTimer, showBackdrop } = useTimer();
-  const { user } = useAuth();
-  console.log("us", user?.email);
-  const { postVote } = useHandleVotes();
+  const [user, setUser] = useState<any>(null);
+  const { sendOtp } = useHandleVotes();
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  useEffect(() => {
+    const userSaved = localStorage.getItem("user");
+    const storedAuthToken = localStorage.getItem("authToken");
+
+    if (userSaved) {
+      try {
+        setUser(JSON.parse(userSaved));
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
+    }
+
+    if (storedAuthToken) {
+      setAuthToken(storedAuthToken);
+    }
+  }, []);
 
   const [selectedCandidates, setSelectedCandidates] = useState<{
     [key in keyof CandidateCategories]: string;
@@ -54,7 +70,6 @@ const Dashboard = () => {
     });
 
     setSelectedCandidates(newSelectedCandidates);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelect = (
@@ -75,8 +90,10 @@ const Dashboard = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("selected", selectedCandidates);
-    await postVote(selectedCandidates);
+    console.log("user");
+    console.log("authToken", authToken);
+    await sendOtp(user.email);
+
     setIsModalOpen(true);
   };
 
@@ -122,6 +139,14 @@ const Dashboard = () => {
       .toString()
       .padStart(2, "0")}`;
   };
+  if (user?.hasVoted) {
+    return (
+      <p className="text-center font-bold mt-10 text-2xl bg-green-200 rounded-lg p-16 mx-32 shadow-lg">
+        Your vote has been recorded. Thank you!!!
+      </p>
+    );
+  }
+
   return (
     <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
       {!showBackdrop && (
@@ -218,7 +243,11 @@ const Dashboard = () => {
             Vote Now
           </button>
         </div>
-        <OtpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        <OtpModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          selectedCandidates={selectedCandidates}
+        />
       </>
     </div>
   );

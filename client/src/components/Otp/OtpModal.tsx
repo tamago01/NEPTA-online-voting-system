@@ -1,33 +1,27 @@
 "use client";
-
-import { useAuth } from "@/hooks/useAuth";
 import { useHandleVotes } from "@/hooks/useHandleVotes";
+import { log } from "console";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface OtpModalProps {
   isOpen: boolean;
   onClose: () => void;
+  selectedCandidates: any;
 }
 
-const OtpModal = ({ isOpen, onClose }: OtpModalProps) => {
+const OtpModal = ({ isOpen, onClose, selectedCandidates }: OtpModalProps) => {
   const [otp, setOtp] = useState("");
-
-  const { sendOtp } = useHandleVotes();
-
-  const { user } = useAuth();
+  const { postVote } = useHandleVotes();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !user.email) {
-      console.error("User or email not found");
-      return;
-    }
+    console.log("selectedCandidates", selectedCandidates);
+    await postVote(selectedCandidates);
+    router.push("/results");
 
-    const email: string = user?.email;
-    console.log("OTP Entered:", otp);
-    await sendOtp(otp, email);
-    // window.location.href = "/results";
-    onClose();
+    // onClose();
   };
 
   if (!isOpen) return null;

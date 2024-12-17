@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface AuthData {
@@ -14,7 +15,8 @@ interface User {
   id: string;
   name: string;
   email: string;
-  isAdmin: boolean;
+  token: string;
+  hasVoted: boolean;
 }
 
 export function useAuth() {
@@ -22,34 +24,53 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const router: any = useRouter();
 
-  const fetchUser = async () => {
-    console.log("users", user)
+  const login = async (email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
         {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
           credentials: "include",
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
-        console.log("data", data);
-        if (data?.user) {
-          setUser(data.user);
-        }
+        console.log("data", data.user);
+
+        setSuccess(true);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("authToken", data.user.token);
+        router.push("/dashboard");
+      } else {
+        setError(data.message || "Login failed");
       }
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      console.error("Login error:", err);
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
+    } finally {
+      setLoading(false);
     }
   };
-
   useEffect(() => {
-    fetchUser();
-  }, []);
-
-  //register
+    if (user) {
+      console.log("User updated:", user);
+      router.push("/dashboard");
+    }
+  }, [user]);
   async function register(data: RegisterData) {
     setLoading(true);
     setError(null);
@@ -83,43 +104,6 @@ export function useAuth() {
     }
   }
 
-  const login = async (email: string, password: string, router: any) => {
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-          credentials: "include",
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess(true);
-        setUser(data);
-        router.push("/dashboard");
-      } else {
-        setError(data.message || "Login failed");
-      }
-    } catch (err) {
-      console.error("Login error:", err);
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const logout = async () => {
     setLoading(true);
     setError(null);
@@ -135,6 +119,8 @@ export function useAuth() {
 
       if (response.ok) {
         setUser(null);
+        localStorage.removeItem("user");
+        localStorage.removeItem("authToken");
         window.location.href = "/";
       } else {
         throw new Error("Failed to log out");

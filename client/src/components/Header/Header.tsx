@@ -1,18 +1,31 @@
 "use client";
-import { useAuth } from "@/hooks/useAuth";
-import Image from "next/image";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import React, { useState } from "react";
+import Image from "next/image";
+import { useAuth } from "@/hooks/useAuth"; // Adjust the import path as needed
 
 const Header = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // This code will only run on the client-side
+    const userSaved = localStorage.getItem("user");
+    if (userSaved) {
+      try {
+        setUser(JSON.parse(userSaved));
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
+    }
+  }, []);
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   return (
     <div className="w-full flex justify-between items-center mx-auto border-b py-3 px-4 bg-gradient-to-r from-white via-green-100 to-green-300 shadow-sm">
-    
       <Link href="/" className="ml-10">
         <Image
           src="/images/nepta.png"
