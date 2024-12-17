@@ -1,5 +1,9 @@
 // lib/auth.ts
 import { jwtVerify } from "jose";
+interface TokenPayload {
+  email?: string;
+  [key: string]: any;
+}
 
 export async function verifyToken(token?: string) {
   if (!token) {
@@ -15,7 +19,8 @@ export async function verifyToken(token?: string) {
 
   try {
     const { payload } = await jwtVerify(token, secretKey);
-    return payload;
+    const typedPayload: TokenPayload = payload;
+    return typedPayload;
   } catch {
     throw new Error(`Token verification failed}`);
   }

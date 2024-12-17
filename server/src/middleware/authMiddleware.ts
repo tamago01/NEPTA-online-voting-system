@@ -15,13 +15,13 @@ export const authMiddleware = (
         .json({ message: "Unauthorized: No token provided" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
     const user = decoded;
     if (!user) {
       return res.status(401).json({ message: "Unauthorized: User not found" });
     }
 
-    req.user = user
+    req.user = user;
     next();
   } catch (error) {
     console.error("Error in authMiddleware:", error);

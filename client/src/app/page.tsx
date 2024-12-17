@@ -1,6 +1,8 @@
 import Header from "@/components/Header/Header";
 import Image from "next/image";
 
+import banner from "../../images/banner.jpg";
+
 export default function Home() {
   return (
     <>
@@ -11,7 +13,7 @@ export default function Home() {
 
         <div className="relative w-full h-auto">
           <Image
-            src="https://img.freepik.com/premium-photo/engaged-audience-financial-seminar-group-image_853163-18959.jpg"
+            src={banner}
             alt="Voters"
             className="h-[100vh] lg:h-[90vh] w-full object-cover shadow-lg"
             width={800}

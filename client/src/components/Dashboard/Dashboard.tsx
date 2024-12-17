@@ -123,7 +123,7 @@ const Dashboard = () => {
   };
   return (
     <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
-      {showBackdrop && (
+      {!showBackdrop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-lg">
           {timerValue > 0 ? (
             <div className="text-center text-white">

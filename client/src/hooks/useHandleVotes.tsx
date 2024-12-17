@@ -5,7 +5,6 @@ export function useHandleVotes() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  
   const postVote = async (selectedCandidates: Record<string, string>) => {
     try {
       setLoading(true);
@@ -21,11 +20,34 @@ export function useHandleVotes() {
       );
 
       await Promise.all(postRequests);
-
     } catch (err) {
       console.error("Failed to post votes:", err);
       setError("Failed to post votes.");
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendOtp = async (otp: string, email: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/send-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ otp, email }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("otpData", data);
+    } catch (error) {
+      console.error("Failed to send otp.");
       setLoading(false);
     }
   };
@@ -55,6 +77,7 @@ export function useHandleVotes() {
   return {
     postVote,
     getResults,
+    sendOtp,
     results,
     loading,
     error,

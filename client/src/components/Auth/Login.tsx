@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
+import banner from "../../images/banner.jpg";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,8 +20,8 @@ const Login = () => {
     <div className="relative h-screen flex items-center justify-center w-full">
       <div className="absolute inset-0 w-full">
         <Image
-          src="https://img.freepik.com/premium-photo/engaged-audience-financial-seminar-group-image_853163-18959.jpg"
-          alt="Voters"
+          src={banner}
+          alt="banner"
           width={800}
           height={600}
           className="w-full h-full object-cover"
