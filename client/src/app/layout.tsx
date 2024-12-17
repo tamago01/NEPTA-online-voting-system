@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import "./globals.css";
 import { TimerProvider } from "./context/TimeProvider";
 
 export default function RootLayout({
