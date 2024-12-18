@@ -96,6 +96,7 @@ export class AuthService {
     const options = { expiresIn: process.env.JWT_EXPIRES_IN };
     return jwt.sign(payload, secret, options);
   }
+  
   public generateRandomPassword() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
     let password = '';

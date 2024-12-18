@@ -19,15 +19,25 @@ export class App {
     await mongodbConnection();
   }
   private setMiddlewares(): void {
+    console.log('setting middlewares');
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     // Specify the exact origin for CORS when credentials are included
-    this.app.use(cors());
+    this.app.use(
+      cors({
+        origin: "https://your-frontend-domain.com , https://nepta-online-voting-system-4p84.vercel.app, *", // Replace with your actual front-end URL
+        credentials: true, // Enable cookies and credentials
+      })
+    );
+  
 
     // Handle preflight requests for OPTIONS
     // this.app.options("*", cors());
+    this.app.options("*", cors());
 
     this.app.use(cookieParser());
+    // Specify the exact origin for CORS when credentials are included
+    console.log('middlewares set');
   }
 
   private setRoutes(): void {
@@ -47,6 +57,7 @@ export class App {
       }
     );
   }
+  
   public listen(port: number): void {
     this.app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
