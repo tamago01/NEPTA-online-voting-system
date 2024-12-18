@@ -9,7 +9,7 @@ import yadavsujit from "../../images/yadavsujit.png";
 import sujeetsingh from "../../images/sujeetsingh.jpg";
 import om from "../../images/om.jpg";
 import ekina from "../../images/ekina.jpeg";
-import ujjwal from "../../images/ujjwal.jpg";
+import ujjwal from "../../images/ujjwal.jpeg";
 import umashankar from "../../images/umashankar.jpg";
 import saugat from "../../images/saugat.jpg";
 import ashish from "../../images/ashish.jpg";
