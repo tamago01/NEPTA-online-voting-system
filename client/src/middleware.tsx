@@ -2,8 +2,11 @@ import { NextResponse, NextRequest } from "next/server";
 import { verifyToken } from "../lib/auth";
 
 export const config = {
+
   runtime: "nodejs",
-  matcher: ["/((?!_next|api|favicon.ico).*)", "/dashboard"],
+  matcher: ["/((?!_next|api|favicon.ico).*)", "/dashboard"], 
+
+  //
 };
 
 export async function middleware(req: NextRequest) {
