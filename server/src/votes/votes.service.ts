@@ -4,6 +4,83 @@ import { emailService } from "../service/emailProvider";
 import { Candidate } from "./candidate.schema";
 
 export class VotesService {
+  // public async postVotes(votes: Record<string, string[]>, userEmail: string) {
+  //   try {
+  //     console.log("User Email:", userEmail);
+  //     console.log("Received Payload:", votes);
+
+  //     const user = await User.findOne({
+  //       email: userEmail,
+  //       hasVoted: true,
+  //     });
+  //     if (user) {
+  //       throw new Error(
+  //         "You have already voted. Multiple votes are not allowed."
+  //       );
+  //     }
+
+  //     const hasCandidatesSelected = Object.values(votes).some(
+  //       (candidates) => candidates.length > 0
+  //     );
+
+  //     if (!hasCandidatesSelected) {
+  //       await User.findOneAndUpdate(
+  //         { email: userEmail },
+  //         { $set: { hasVoted: true } }
+  //       );
+
+  //       return {
+  //         message: "No candidates selected. No updates were made.",
+  //         candidates: [],
+  //       };
+  //     }
+
+  //     const votePromises = Object.entries(votes).map(
+  //       async ([category, candidates]) => {
+  //         if (candidates.length > 0) {
+  //           const candidateName = candidates[0];
+
+  //           const updatedCandidate = await Candidate.findOneAndUpdate(
+  //             { name: candidateName, category: category.toLowerCase() },
+  //             { $inc: { voteCount: 1 } },
+  //             {
+  //               new: true,
+  //               upsert: true,
+
+  //               setDefaultsOnInsert: true,
+  //             }
+  //           );
+
+  //           console.log("Individual Candidate Update:", updatedCandidate);
+  //           return updatedCandidate;
+  //         }
+  //         return null;
+  //       }
+  //     );
+
+  //     const updatedCandidates = await Promise.all(votePromises);
+  //     const validCandidates = updatedCandidates.filter(
+  //       (candidate) => candidate !== null
+  //     );
+
+  //     console.log("Updated Candidates in Database:", validCandidates);
+
+  //     await User.findOneAndUpdate(
+  //       { email: userEmail },
+  //       { $set: { hasVoted: true } }
+  //     );
+
+  //     return {
+  //       message: "Vote successfully added.",
+  //       data: {
+  //         candidates: validCandidates,
+  //       },
+  //     };
+  //   } catch (err) {
+  //     console.error("Database error:", err);
+  //     throw new Error(`Failed to update votes: ${err.message}`);
+  //   }
+  // }
   public async postVotes(votes: Record<string, string[]>, userEmail: string) {
     try {
       console.log("User Email:", userEmail);
@@ -19,8 +96,17 @@ export class VotesService {
         );
       }
 
-      const hasCandidatesSelected = Object.values(votes).some(
-        (candidates) => candidates.length > 0
+      const multiSelectCategories = [
+        "committeememberopen",
+        "nationalcommitteemember",
+      ];
+
+      const hasCandidatesSelected = Object.entries(votes).some(
+        ([category, candidates]) =>
+          candidates.length > 0 &&
+          (multiSelectCategories.includes(category.toLowerCase())
+            ? candidates.length <= 5
+            : candidates.length === 1)
       );
 
       if (!hasCandidatesSelected) {
@@ -30,40 +116,69 @@ export class VotesService {
         );
 
         return {
-          message: "No candidates selected. No updates were made.",
+          message:
+            "No candidates selected or invalid selection. No updates were made.",
           candidates: [],
         };
       }
 
       const votePromises = Object.entries(votes).map(
         async ([category, candidates]) => {
-          if (candidates.length > 0) {
+          const normalizedCategory = category.toLowerCase();
+
+          // Handle multi-select categories
+          if (
+            multiSelectCategories.includes(normalizedCategory) &&
+            candidates.length > 0 &&
+            candidates.length <= 5
+          ) {
+            const categoryVotePromises = candidates.map(
+              async (candidateName) => {
+                const updatedCandidate = await Candidate.findOneAndUpdate(
+                  { name: candidateName, category: normalizedCategory },
+                  { $inc: { voteCount: 1 } },
+                  {
+                    new: true,
+                    upsert: true,
+                    setDefaultsOnInsert: true,
+                  }
+                );
+
+                console.log("Multi-select Candidate Update:", updatedCandidate);
+                return updatedCandidate;
+              }
+            );
+
+            return await Promise.all(categoryVotePromises);
+          }
+          // Handle single-select categories
+          else if (candidates.length === 1) {
             const candidateName = candidates[0];
 
             const updatedCandidate = await Candidate.findOneAndUpdate(
-              { name: candidateName, category: category.toLowerCase() },
+              { name: candidateName, category: normalizedCategory },
               { $inc: { voteCount: 1 } },
               {
                 new: true,
                 upsert: true,
-
                 setDefaultsOnInsert: true,
               }
             );
 
-            console.log("Individual Candidate Update:", updatedCandidate);
-            return updatedCandidate;
+            console.log("Single-select Candidate Update:", updatedCandidate);
+            return [updatedCandidate];
           }
-          return null;
+
+          return [];
         }
       );
 
-      const updatedCandidates = await Promise.all(votePromises);
-      const validCandidates = updatedCandidates.filter(
-        (candidate) => candidate !== null
-      );
+      const updatedCandidatesArrays = await Promise.all(votePromises);
+      const updatedCandidates = updatedCandidatesArrays
+        .flat()
+        .filter((candidate) => candidate !== null);
 
-      console.log("Updated Candidates in Database:", validCandidates);
+      console.log("Updated Candidates in Database:", updatedCandidates);
 
       await User.findOneAndUpdate(
         { email: userEmail },
@@ -73,7 +188,7 @@ export class VotesService {
       return {
         message: "Vote successfully added.",
         data: {
-          candidates: validCandidates,
+          candidates: updatedCandidates,
         },
       };
     } catch (err) {

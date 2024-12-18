@@ -94,41 +94,88 @@ const Dashboard = () => {
     return initialState;
   });
 
+ 
+  // const handleCheckboxChange = (
+  //   category: keyof CandidateCategories,
   //   candidate: string
   // ) => {
   //   setSelectedCandidates((prev) => {
-  //     const isSelected = prev[category].includes(candidate);
-  //     const updatedCategory = isSelected
-  //       ? prev[category].filter((name) => name !== candidate)
-  //       : [...prev[category], candidate];
-  //     return { ...prev, [category]: updatedCategory };
+  //     if (candidates[category].length > 1) {
+  //       const currentSelected = prev[category];
+  //       const isCurrentlySelected = currentSelected.includes(candidate);
+
+  //       if (isCurrentlySelected) {
+  //         return {
+  //           ...prev,
+  //           [category]: [],
+  //         };
+  //       }
+
+  //       return {
+  //         ...prev,
+  //         [category]: [candidate],
+  //       };
+  //     }
+
+  //     return prev;
   //   });
   // };
+  
   const handleCheckboxChange = (
     category: keyof CandidateCategories,
     candidate: string
   ) => {
     setSelectedCandidates((prev) => {
+     
+      if (category === 'CommitteeMemberOpen' || category === 'NationalCommitteeMember') {
+        const currentSelected = prev[category];
+        const isCurrentlySelected = currentSelected.includes(candidate);
+  
+        if (isCurrentlySelected) {
+          
+          return {
+            ...prev,
+            [category]: currentSelected.filter(name => name !== candidate)
+          };
+        }
+  
+     
+        if (currentSelected.length < 5) {
+          return {
+            ...prev,
+            [category]: [...currentSelected, candidate]
+          };
+        }
+  
+       
+        return {
+          ...prev,
+          [category]: [...currentSelected.slice(1), candidate]
+        };
+      }
+  
+      
       if (candidates[category].length > 1) {
         const currentSelected = prev[category];
         const isCurrentlySelected = currentSelected.includes(candidate);
-
+  
         if (isCurrentlySelected) {
           return {
             ...prev,
             [category]: [],
           };
         }
-
+  
         return {
           ...prev,
           [category]: [candidate],
         };
       }
-
+  
       return prev;
     });
   };
+
   console.log("user", user);
   const handleSendOtp = async () => {
     if (!user?.user?.email) {
