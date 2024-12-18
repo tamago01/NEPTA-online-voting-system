@@ -220,7 +220,13 @@ const Dashboard = () => {
       .toString()
       .padStart(2, "0")}`;
   };
-
+  if (user?.hasVoted ?? false) {
+    return (
+      <p className="text-center font-bold  text-2xl bg-green-200 rounded-lg p-6 mx-48 mt-20 shadow-lg">
+        Your vote has been recorded. Thank you!!!
+      </p>
+    );
+  }
   return (
     <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
       {!showBackdrop && (
