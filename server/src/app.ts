@@ -20,20 +20,19 @@ export class App {
   }
   private setMiddlewares(): void {
     this.app.use(express.json());
-
+    this.app.use(express.urlencoded({ extended: true }));
     // Specify the exact origin for CORS when credentials are included
     this.app.use(cors());
 
     // Handle preflight requests for OPTIONS
     // this.app.options("*", cors());
 
-    this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
   }
 
   private setRoutes(): void {
     this.app.get("/", (req: Request, res: Response) => {
-      res.json({ message: "Server is running!" });
+      res.json({ message: "Server is running! Check cors" });
     });
     this.app.use("/auth", authRoutes);
     this.app.use("/votes", votesRoutes);
