@@ -24,16 +24,13 @@ export class App {
     this.app.use(express.urlencoded({ extended: true }));
     // Specify the exact origin for CORS when credentials are included
     this.app.use(
-      cors({
-        origin: "https://your-frontend-domain.com , https://nepta-online-voting-system-4p84.vercel.app, *", // Replace with your actual front-end URL
-        credentials: true, // Enable cookies and credentials
-      })
+      cors()
     );
   
 
     // Handle preflight requests for OPTIONS
     // this.app.options("*", cors());
-    this.app.options("*", cors());
+    // this.app.options("*", cors());
 
     this.app.use(cookieParser());
     // Specify the exact origin for CORS when credentials are included

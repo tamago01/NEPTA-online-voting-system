@@ -40,7 +40,6 @@ export function useAuth() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email, password }),
-          credentials: "include",
         }
       );
 
@@ -113,7 +112,6 @@ export function useAuth() {
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`,
         {
           method: "POST",
-          credentials: "include",
         }
       );
 
