@@ -5,26 +5,42 @@ export function useHandleVotes() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const postVote = async (selectedCandidates: Record<string, string>) => {
+  const postVote = async (selectedCandidates: any) => {
+    const token = localStorage.getItem("authToken");
+    console.log("s2", selectedCandidates);
+
     try {
       setLoading(true);
       setError(null);
 
-      const postRequests = Object.entries(selectedCandidates).map(
-        ([category, candidateName]) =>
-          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/post-votes`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ candidateName, category }),
-            credentials: "include",
-          })
+      const postVote = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/post-votes`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(selectedCandidates),
+        }
       );
 
-      const res = await Promise.all(postRequests);
-      console.log(
-        "res",
-        res.map((r) => r.json())
-      );
+      const data = await postVote.json();
+      console.log(`data  in post vote`, data);
+
+      // const postRequests =
+      //    await  fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/post-votes`, {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify({ candidateName, category }),
+      //       credentials: "include",
+      // );
+
+      // const res = await Promise.all(postRequests);
+      // console.log(
+      //   "res",
+      //   res.map((r) => r.json())
+      // );
     } catch (err) {
       console.error("Failed to post votes:", err);
       setError("Failed to post votes.");

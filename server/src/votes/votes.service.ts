@@ -4,47 +4,65 @@ import { Candidate } from "./candidate.schema";
 
 export class VotesService {
   public async postVotes(
-    candidateName: string,
-    category: string,
+    voteData: Record<string, string | string[]>,
     userEmail: string
   ) {
     try {
-      let candidate = await Candidate.findOneAndUpdate(
-        { name: candidateName, category },
-        { $inc: { voteCount: 1 } },
-        { new: true }
-      );
-
-      if (!candidate) {
-        candidate = await Candidate.create({
-          name: candidateName,
-          category,
-          voteCount: 1,
-        });
-
-        console.log("Created new candidate:", candidate);
+      const maxCandidates = 5;
+      const categoriesWithLimit = ["CommitteeMemberOpen", "NationalCommitteeMember"];
+      for (const category in voteData) {
+        const candidates = Array.isArray(voteData[category])
+          ? voteData[category]
+          : [voteData[category]];
+  
+        if (categoriesWithLimit.includes(category) && candidates.length > maxCandidates) {
+          throw new Error(`Category '${category}' cannot have more than ${maxCandidates} votes.`);
+        }
       }
-      console.log("userEmail", userEmail);
-
+  
+      // Process votes
+      for (const [category, candidateList] of Object.entries(voteData)) {
+        const candidates = Array.isArray(candidateList) ? candidateList : [candidateList];
+  
+        for (const candidateName of candidates) {
+          let candidate = await Candidate.findOneAndUpdate(
+            { name: candidateName, category },
+            { $inc: { voteCount: 1 } },
+            { new: true }
+          );
+  
+          if (!candidate) {
+            candidate = await Candidate.create({
+              name: candidateName,
+              category,
+              voteCount: 1,
+            });
+  
+            console.log("Created new candidate:", candidate);
+          }
+        }
+      }
+  
+      // Update user voting status
       const user = await User.findOneAndUpdate(
         { email: userEmail },
         { $set: { hasVoted: true } },
         { new: true }
       );
-
+  
       if (!user) {
         throw new Error("User not found to update voting status");
       }
-
+  
       return {
-        message: `Vote successfully added for ${candidateName} in category '${category}'.`,
-        candidate,
+        message: "Votes successfully processed.",
       };
     } catch (error) {
       console.error("Database error:", error);
-      throw new Error(`Failed to update vote: ${error.message}`);
+      throw new Error(`Failed to process votes: ${error.message}`);
     }
   }
+  
 
   public async getResults() {
     try {

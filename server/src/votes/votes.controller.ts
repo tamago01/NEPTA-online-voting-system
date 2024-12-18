@@ -14,23 +14,18 @@ export class VotesController {
 
   public async postVote(req: Request, res: Response): Promise<void> {
     try {
-      const { candidateName, category } = req.body;
-      console.log("req", req.user);
-    
-      if (!candidateName || !category) {
-        res
-          .status(400)
-          .json({ message: "Candidate name and category are required." });
-        return;
-      }
-
-      const result = await this.votesService.postVotes(candidateName, category, req.user.email);
-      res.status(200).json({ data: result });
+      const { voteData } = req.body; 
+      console.log("User making the request:", req.user);
+  
+      const result = await this.votesService.postVotes(voteData, req.user.email);
+  
+      res.status(200).json({ message: result.message });
     } catch (error: any) {
       console.error("Error in postVote:", error);
       res.status(500).json({ message: error.message });
     }
   }
+  
 
   public async getResults(_req: Request, res: Response): Promise<void> {
     try {

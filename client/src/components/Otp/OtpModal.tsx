@@ -18,11 +18,28 @@ const OtpModal = ({ isOpen, onClose, selectedCandidates }: OtpModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("selectedCandidates", selectedCandidates);
-    // await postVote(selectedCandidates);
+    const res = transformVoteData(selectedCandidates);
+    console.log("resss", res);
+
+    await postVote(res);
     // router.push("/results");
 
     // onClose();
   };
+  function transformVoteData(rawData: any) {
+    const transformedData = Object.fromEntries(
+      Object.entries(rawData)
+        .filter(([_, value]) => value !== "") // Remove empty values
+        .map(([key, value]) => [
+          key,
+          typeof value === "string" && value.includes(",")
+            ? value.split(",").map((v) => v.trim())
+            : value, // Convert comma-separated strings to arrays
+        ])
+    );
+
+    return { voteData: transformedData };
+  }
 
   if (!isOpen) return null;
 
