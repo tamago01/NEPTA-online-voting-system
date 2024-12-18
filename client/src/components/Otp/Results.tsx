@@ -56,7 +56,7 @@ const Results = () => {
           </div>
         </div>
       ) : (
-        <p className="text-center font-bold mt-10 text-2xl bg-green-200 rounded-lg p-6 shadow-lg">
+        <p className="text-center font-bold mt-10 text-lg md:text-2xl bg-green-200 rounded-lg p-6 shadow-lg">
           Your vote has been recorded. Thank you!!!
         </p>
       )}

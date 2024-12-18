@@ -83,10 +83,9 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      router.push("/login"); // Redirect to login if no token found
+      router.push("/login");
     } else {
       console.log("Token found:", token);
-      // Optional: Validate token with server
     }
   }, []);
 
@@ -222,14 +221,14 @@ const Dashboard = () => {
   };
   if (user?.hasVoted ?? false) {
     return (
-      <p className="text-center font-bold  text-2xl bg-green-200 rounded-lg p-6 mx-48 mt-20 shadow-lg">
+      <p className="text-center font-bold mx-14 text-lg md:text-2xl bg-green-200 rounded-lg p-6 md:mx-48 mt-20 shadow-lg">
         Your vote has been recorded. Thank you!!!
       </p>
     );
   }
   return (
-    <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
-      {!showBackdrop && (
+    <div className="max-sm:px-6 md:px-12 lg:mt- lg:px-24 py-10 mx-auto">
+      {/* {!showBackdrop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-lg">
           {timerValue > 0 ? (
             <div className="text-center text-white">
@@ -250,13 +249,12 @@ const Dashboard = () => {
             ""
           )}
         </div>
-      )}
-      <div className=" mb-14 w-full border-b py-3 border-gray-700">
-        <label className=" text-[24px] font-bold capitalize text-gray-700">
-          <a className="text-green-400">Welcome,</a> to the 52th election of
-          NEPTA
+      )} */}
+      <div className="md:px-10 mb-14 w-full border-b py-3 border-gray-300">
+        <label className=" max-sm:text-[14px] md:text-[24px] font-bold  text-gray-700">
+          <a className="text-green-400">Welcome,</a> to the NEPTA election of
+          2024
         </label>
-        Vote starts in {formatTime(timerValue)}
       </div>
       <form
         onSubmit={(e) => {
@@ -268,7 +266,7 @@ const Dashboard = () => {
         {Object.entries(candidates).map(([category, names]) => (
           <div key={category} className="mb-10 lg:px-10">
             <div className="border-l-4 border-red-400 px-6">
-              <h2 className="mb-4 text-[24px] font-bold capitalize text-gray-700">
+              <h2 className="mb-4 text-[18px] md:text-[24px] font-bold capitalize text-gray-700">
                 {category.replace(/([A-Z])/g, " $1").trim()}
               </h2>
             </div>
@@ -319,16 +317,11 @@ const Dashboard = () => {
                     <div className="lg:flex items-center gap-4">
                       <div>
                         <p
-                          className={`text-[20px] font-semibold ${
+                          className={`max-sm:text-[14px] mdtext-[20px] font-semibold ${
                             isDisabled ? "text-gray-500" : "text-gray-800"
                           }`}
                         >
                           {name}
-                          {isDisabled && (
-                            <span className="ml-2 text-sm text-gray-500">
-                              (Automatically Selected)
-                            </span>
-                          )}
                         </p>
                       </div>
                     </div>
@@ -339,7 +332,7 @@ const Dashboard = () => {
           </div>
         ))}
 
-        <div className="text-center mt-8">
+        <div className="flex justify-center py-14">
           <button
             type="submit"
             disabled={isOtpSending}

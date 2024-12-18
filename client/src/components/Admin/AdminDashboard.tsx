@@ -22,27 +22,51 @@ const AdminDashboard = () => {
   const [isPublished, setIsPublished] = useState(false);
   const { getResults } = useHandleVotes();
   const router = useRouter();
+  const categoryOrder = [
+    "president",
+    "vicepresident",
+    "vicepresidentfemale",
+    "secretarygeneral",
+    "secretary",
+    "treasurer",
+    "cotreasurer",
+    "committeememberopen",
+    "committeememberfemale",
+    "committeemembermadheshi",
+    "committeememberjanajati",
+    "nationalcommitteemember",
+  ];
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     console.log("Token found:", token);
 
     if (!token) {
-      router.push("/"); // Redirect to login if no token found
+      router.push("/");
     } else {
       const user = JSON.parse(localStorage.getItem("user") ?? "");
       if (!user || user.email !== "admin@admin.com") {
         router.push("/dashboard");
       }
-      // Optional: Validate token with server
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetchResults = async () => {
       try {
         setLoading(true);
         const data = await getResults();
-        setResults(data);
+        
+        const categoryMap = data.reduce((map: any, category: any) => {
+          map[category._id] = category;
+          return map;
+        }, {} as Record<string, CategoryData>);
+
+        const orderedResults = categoryOrder
+          .map((id) => categoryMap[id])
+          .filter(Boolean);
+
+       
+        setResults(orderedResults);
       } catch (err) {
         setError("Failed to fetch results.");
         console.error("Error fetching results:", err);
@@ -52,12 +76,11 @@ const AdminDashboard = () => {
     };
 
     fetchResults();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const gatherWinnersData = () => {
     return results.map((category) => {
-      const sortedCandidates = category.candidates.sort(
+      const sortedCandidates = [...category.candidates].sort(
         (a, b) => b.voteCount - a.voteCount
       );
       const winner = sortedCandidates[0];
@@ -68,6 +91,7 @@ const AdminDashboard = () => {
       };
     });
   };
+
   const handlePublish = () => {
     setLoading(true);
     const winnersData = gatherWinnersData();
@@ -83,61 +107,56 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <h2 className="p-10 container mb-4 text-[24px] font-bold capitalize text-gray-700">
-        Welcome to Admin Dashboard
-      </h2>
+      <div className="container mx-auto px-4">
+        <h2 className="py-4 text-xl sm:text-2xl font-bold text-gray-700">
+          Welcome to the Admin Dashboard
+        </h2>
 
-      <div className="border rounded-lg p-5 bg-white shadow-md mx-16">
-        <Tabs defaultValue="Results">
-          <TabsList className="ml-10">
-            <TabsTrigger
-              className="px-14 py-3 data-[state=active]:bg-green-400"
-              value="Results"
-            >
-              Results
-            </TabsTrigger>
-            <TabsTrigger
-              className="px-14 py-3 data-[state=active]:bg-green-400"
-              value="LiveCount"
-            >
-              Live Count
-            </TabsTrigger>
-          </TabsList>
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <Tabs defaultValue="Results">
+            <TabsList className="flex flex-wrap justify-center  p-2 border-b">
+              <TabsTrigger
+                className="px-4 py-2 border text-sm sm:text-base data-[state=active]:bg-green-400 rounded-md transition-colors"
+                value="Results"
+              >
+                Results
+              </TabsTrigger>
+              <TabsTrigger
+                className="px-4 py-2 border text-sm sm:text-base data-[state=active]:bg-green-400 rounded-md transition-colors"
+                value="LiveCount"
+              >
+                Live Count
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="LiveCount">
-            {loading ? (
-              <p>Loading...</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
-              results?.map((category) => {
-                const sortedCandidates = category.candidates.sort(
+            <TabsContent value="LiveCount" className="p-4">
+              {results?.map((category) => {
+                const sortedCandidates = [...category.candidates].sort(
                   (a, b) => b.voteCount - a.voteCount
                 );
-
                 const highestVote = sortedCandidates[0]?.voteCount;
                 return (
-                  <div key={category._id} className="m-10">
-                    <h3 className="mb-4 text-[20px] font-bold capitalize text-gray-700 border-b pb-2">
+                  <div key={category._id} className="mb-6">
+                    <h3 className="mb-4 text-lg font-bold text-gray-700 border-b pb-2">
                       {category._id.replace(/([A-Z])/g, " $1").trim()}
                     </h3>
-                    <div className="flex flex-col gap-2">
+                    <div className="space-y-2">
                       {category.candidates.map((candidate) => (
                         <div
                           key={candidate.name}
-                          className={`flex justify-between items-center border-b py-2 px-6 rounded-lg ${
+                          className={`flex justify-between items-center p-3 rounded-lg ${
                             candidate.voteCount === highestVote
-                              ? "bg-green-200"
-                              : ""
+                              ? "bg-green-100"
+                              : "bg-gray-50"
                           }`}
                         >
-                          <span className="text-[18px] font-semibold text-gray-700">
+                          <span className="text-base font-semibold text-gray-700">
                             {candidate.name}
                           </span>
                           <span
-                            className={`text-[18px] ${
+                            className={`text-base ${
                               candidate.voteCount === highestVote
                                 ? "text-red-600 font-bold"
                                 : "text-gray-900"
@@ -150,59 +169,56 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 );
-              })
-            )}
-          </TabsContent>
+              })}
+            </TabsContent>
 
-          <TabsContent value="Results">
-            {loading ? (
-              <p>Loading...</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
-              <div className="m-10 bg-gray-100 rounded-lg p-5 shadow-md">
-                <h3 className="mb-4 text-[20px] font-bold capitalize text-gray-700">
+            <TabsContent value="Results" className="p-4">
+              <div className="bg-gray-100 rounded-lg p-4 shadow-md">
+                <h3 className="mb-4 text-lg font-bold text-gray-700">
                   Winners Across All Categories
                 </h3>
 
-                {results.map((category) => {
-                  const sortedCandidates = category.candidates.sort(
-                    (a, b) => b.voteCount - a.voteCount
-                  );
-                  const winner = sortedCandidates[0];
+                <div className="space-y-2">
+                  {results.map((category) => {
+                    const sortedCandidates = [...category.candidates].sort(
+                      (a, b) => b.voteCount - a.voteCount
+                    );
+                    const winner = sortedCandidates[0];
 
-                  return (
-                    <div
-                      key={category._id}
-                      className="flex justify-between items-center mt-2  border-b border-black px-6 py-4"
-                    >
-                      <span className="font-semibold text-gray-800 text-[18px]">
-                        {category._id.replace(/([A-Z])/g, " $1").trim()}:{" "}
-                        <div> {winner.name} </div>
-                      </span>
+                    return (
+                      <div
+                        key={category._id}
+                        className="flex justify-between items-center p-3 border-b last:border-b-0 bg-white rounded-lg"
+                      >
+                        <span className="font-semibold text-gray-800 text-base">
+                          {category._id.replace(/([A-Z])/g, " $1").trim()}:{" "}
+                          <span className="ml-2">{winner.name}</span>
+                        </span>
 
-                      <span className="font-bold text-red-600 text-[18px]">
-                        {winner.voteCount} votes
-                      </span>
-                    </div>
-                  );
-                })}
+                        <span className="font-bold text-red-600 text-base">
+                          {winner.voteCount} votes
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            )}
-            {isPublished ? (
-              <p className="p-4 ml-10 my-10 border w-max bg-green-200 cursor-disabled rounded-lg text-green-500 font-bold">
-                📤 Data Sent Successfully!
-              </p>
-            ) : (
-              <div
-                onClick={handlePublish}
-                className="bg-green-200 w-max ml-10 my-10 cursor-pointer rounded-lg p-4 mt-10 text-center"
-              >
-                <span className="font-semibold">Publish </span>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+
+              {isPublished ? (
+                <p className="p-4 ml-10 my-10 border w-max bg-green-200 cursor-disabled rounded-lg text-green-500 font-bold">
+                  📤 Data Sent Successfully!
+                </p>
+              ) : (
+                <div
+                  onClick={handlePublish}
+                  className="bg-green-200 w-max ml-10 my-10 cursor-pointer rounded-lg p-4 mt-10 text-center"
+                >
+                  <span className="font-semibold">Publish </span>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
