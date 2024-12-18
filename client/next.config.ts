@@ -1,13 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 
-  experimental: {
-    serverActions: {
-      allowedOrigins: ["https://nepta-online-voting-system-4p84.vercel.app",
-        "https://nepta.onrender.com","*"
-      ],
-    },
-  },
+  // experimental: {
+  //   serverActions: {
+  //     allowedOrigins: "*" ,
+  //   },
+  // },
   trailingSlash: false,
   images: {
     domains: [
