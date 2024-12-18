@@ -5,22 +5,7 @@ import { emailService } from "../service/emailProvider";
 
 
 export class AuthService {
-  public async getUser(id: string) {
-    try {
-      const user = await User.findOne({ id });
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      return {
-        id: user.id,
-        email: user.email,
-      };
-    } catch (error) {
-      console.error("Error in getUser method:", error);
-      throw error;
-    }
-  }
+ 
 
   async register(name: string, email: string, password: string, hasVoted: boolean) {
     try {

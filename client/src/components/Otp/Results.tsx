@@ -38,7 +38,7 @@ const Results = () => {
                   Winner: {winner.winnerName}
                 </div>
                 <span className="mt-2 block text-red-500 font-semibold">
-                  - {winner.votes} votes
+                   {winner.votes} votes
                 </span>
               </div>
             ))}

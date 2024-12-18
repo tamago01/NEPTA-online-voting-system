@@ -12,23 +12,46 @@ export class VotesController {
     this.verifyOtp = this.verifyOtp.bind(this);
   }
 
+  
   public async postVote(req: Request, res: Response): Promise<void> {
     try {
-      const { candidateName, category } = req.body;
-      console.log("req", req.user);
-    
-      if (!candidateName || !category) {
+      
+      const { votes } = req.body;
+      const userEmail = req.user?.email;
+      if (!userEmail) {
         res
-          .status(400)
-          .json({ message: "Candidate name and category are required." });
+          .status(401)
+          .json({ message: "Unauthorized: User not authenticated" });
+        return;
+      }
+      if (!votes || typeof votes !== "object") {
+        res.status(400).json({
+          message: "Votes must be provided as an object.",
+          details: { votesProvided: !!votes },
+        });
         return;
       }
 
-      const result = await this.votesService.postVotes(candidateName, category, req.user.email);
-      res.status(200).json({ data: result });
+      const result = await this.votesService.postVotes(votes, userEmail);
+
+      res.status(200).json({
+        message: "Votes submitted successfully.",
+        data: result,
+      });
     } catch (error: any) {
       console.error("Error in postVote:", error);
-      res.status(500).json({ message: error.message });
+
+      if (error.message.includes("already voted")) {
+        res.status(403).json({
+          message: error.message,
+          code: "DUPLICATE_VOTE",
+        });
+      } else {
+        res.status(500).json({
+          message: "An unexpected error occurred while processing your votes.",
+          errorDetails: error.message,
+        });
+      }
     }
   }
 
@@ -45,20 +68,22 @@ export class VotesController {
   public async sendOtp(_req: Request, res: Response): Promise<void> {
     try {
       console.log("req", _req.body.email);
-      
+
       const data = await this.votesService.sendOtp(_req.body.email);
       console.log("data", data);
       res.status(200).json(data);
     } catch (error) {
       console.log("error", error);
-      
+
       res.status(500).json({ message: error.message });
-      
     }
   }
   public async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
-      const data = await this.votesService.verifyOtp(req.body.email, req.body.otp);
+      const data = await this.votesService.verifyOtp(
+        req.body.email,
+        req.body.otp
+      );
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ message: error.message });

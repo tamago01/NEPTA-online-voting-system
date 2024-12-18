@@ -4,15 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 
+
 const Header = () => {
   const { user, logout } = useAuth();
+  console.log("user", user);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   return (
     <div className="w-full flex justify-between items-center mx-auto border-b py-3 px-4 bg-gradient-to-r from-white via-green-100 to-green-300 shadow-sm">
-    
       <Link href="/" className="ml-10">
         <Image
           src="/images/nepta.png"
@@ -22,12 +23,13 @@ const Header = () => {
           className="object-contain rounded-full"
         />
       </Link>
+      <label className=" text-[24px] font-bold capitalize text-gray-700">
+        Nepal Physiothearapy Association
+      </label>
 
-      {/* User Section */}
       <div className="flex items-center p-4 relative">
-        {user ? (
+        {user?.user ? (
           <>
-            {/* User Icon */}
             <svg
               width="28"
               height="28"
@@ -39,10 +41,9 @@ const Header = () => {
             </svg>
 
             <div className="ml-2 text-sm md:text-lg font-semibold">
-              {user?.email}
+              {user?.user?.email}
             </div>
 
-            {/* Dropdown */}
             <button onClick={toggleDropdown} className="ml-2 p-2">
               <svg
                 width="15"
@@ -69,7 +70,7 @@ const Header = () => {
         ) : (
           <Link href="/login">
             <span className="text-black font-semibold hover:text-green-500 mt-2 md:mt-0">
-              Login
+              {/* Login */}
             </span>
           </Link>
         )}

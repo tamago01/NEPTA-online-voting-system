@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   try {
@@ -33,6 +33,6 @@ export async function middleware(req: NextRequest) {
     return response;
   } catch (err) {
     console.error("Token validation failed:", err);
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 }

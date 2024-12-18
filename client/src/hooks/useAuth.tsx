@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface AuthData {
   email: string;
@@ -10,44 +11,26 @@ interface RegisterData extends AuthData {
   name: string;
   number: string;
 }
+
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  isAdmin: boolean;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    isAdmin: boolean;
+    hasVoted: boolean;
+  };
 }
 
 export function useAuth() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  const fetchUser = async () => {
-    console.log("users", user)
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/users`,
-        {
-          credentials: "include",
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("data", data);
-        if (data?.user) {
-          setUser(data.user);
-        }
-      }
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   //register
   async function register(data: RegisterData) {
@@ -66,9 +49,11 @@ export function useAuth() {
           body: JSON.stringify(data),
         }
       );
-
+      const responseData = await response.json();
       if (!response.ok) {
-        throw new Error(`Failed to register: ${response.statusText}`);
+        throw new Error(
+          responseData?.message || `Failed to register: ${response.statusText}`
+        );
       }
 
       setSuccess(true);
@@ -83,7 +68,7 @@ export function useAuth() {
     }
   }
 
-  const login = async (email: string, password: string, router: any) => {
+  const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
@@ -106,14 +91,22 @@ export function useAuth() {
       if (response.ok) {
         setSuccess(true);
         setUser(data);
+        // Store user in localStorage for persistence
+        localStorage.setItem("user", JSON.stringify(data));
+        console.log("usedatar", data);
         router.push("/dashboard");
       } else {
-        setError(data.message || "Login failed");
+        // Ensure error message is displayed
+        const errorMessage = data.message || "Login failed";
+        setError(errorMessage);
+        console.error("Login failed:", errorMessage);
       }
     } catch (err) {
       console.error("Login error:", err);
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
+        err instanceof Error
+          ? err.message
+          : "An unknown error occurred during login"
       );
     } finally {
       setLoading(false);
@@ -135,7 +128,9 @@ export function useAuth() {
 
       if (response.ok) {
         setUser(null);
-        window.location.href = "/";
+        // Remove user from localStorage
+        localStorage.removeItem("user");
+        router.push("/");
       } else {
         throw new Error("Failed to log out");
       }
@@ -148,5 +143,6 @@ export function useAuth() {
       setLoading(false);
     }
   };
-  return { register, login, logout, user, loading, error, success };
+
+  return { register, login, logout, user, loading, error, success } as const;
 }

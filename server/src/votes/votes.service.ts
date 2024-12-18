@@ -1,48 +1,84 @@
+import mongoose from "mongoose";
 import { User } from "../auth/auth.model";
 import { emailService } from "../service/emailProvider";
 import { Candidate } from "./candidate.schema";
 
 export class VotesService {
-  public async postVotes(
-    candidateName: string,
-    category: string,
-    userEmail: string
-  ) {
+  public async postVotes(votes: Record<string, string[]>, userEmail: string) {
     try {
-      let candidate = await Candidate.findOneAndUpdate(
-        { name: candidateName, category },
-        { $inc: { voteCount: 1 } },
-        { new: true }
+      console.log("User Email:", userEmail);
+      console.log("Received Payload:", votes);
+
+      const user = await User.findOne({
+        email: userEmail,
+        hasVoted: true,
+      });
+      if (user) {
+        throw new Error(
+          "You have already voted. Multiple votes are not allowed."
+        );
+      }
+
+      const hasCandidatesSelected = Object.values(votes).some(
+        (candidates) => candidates.length > 0
       );
 
-      if (!candidate) {
-        candidate = await Candidate.create({
-          name: candidateName,
-          category,
-          voteCount: 1,
-        });
+      if (!hasCandidatesSelected) {
+        await User.findOneAndUpdate(
+          { email: userEmail },
+          { $set: { hasVoted: true } }
+        );
 
-        console.log("Created new candidate:", candidate);
+        return {
+          message: "No candidates selected. No updates were made.",
+          candidates: [],
+        };
       }
-      console.log("userEmail", userEmail);
 
-      const user = await User.findOneAndUpdate(
+      const votePromises = Object.entries(votes).map(
+        async ([category, candidates]) => {
+          if (candidates.length > 0) {
+            const candidateName = candidates[0];
+
+            const updatedCandidate = await Candidate.findOneAndUpdate(
+              { name: candidateName, category: category.toLowerCase() },
+              { $inc: { voteCount: 1 } },
+              {
+                new: true,
+                upsert: true,
+
+                setDefaultsOnInsert: true,
+              }
+            );
+
+            console.log("Individual Candidate Update:", updatedCandidate);
+            return updatedCandidate;
+          }
+          return null;
+        }
+      );
+
+      const updatedCandidates = await Promise.all(votePromises);
+      const validCandidates = updatedCandidates.filter(
+        (candidate) => candidate !== null
+      );
+
+      console.log("Updated Candidates in Database:", validCandidates);
+
+      await User.findOneAndUpdate(
         { email: userEmail },
-        { $set: { hasVoted: true } },
-        { new: true }
+        { $set: { hasVoted: true } }
       );
-
-      if (!user) {
-        throw new Error("User not found to update voting status");
-      }
 
       return {
-        message: `Vote successfully added for ${candidateName} in category '${category}'.`,
-        candidate,
+        message: "Vote successfully added.",
+        data: {
+          candidates: validCandidates,
+        },
       };
-    } catch (error) {
-      console.error("Database error:", error);
-      throw new Error(`Failed to update vote: ${error.message}`);
+    } catch (err) {
+      console.error("Database error:", err);
+      throw new Error(`Failed to update votes: ${err.message}`);
     }
   }
 

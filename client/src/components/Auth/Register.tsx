@@ -185,7 +185,7 @@ export default function Register() {
         <div className="mt-7 text-center text-sm text-[#6C6C6C] md:text-lg">
           Already have an account?{" "}
           <span className="font-semibold text-green-600 underline">
-            <Link href="/login">Login?</Link>
+            <Link href="/">Login?</Link>
           </span>
         </div>
       </div>

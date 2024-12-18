@@ -1,3 +1,4 @@
+import Login from "@/components/Auth/Login";
 import { Banners } from "@/components/Constants/Photos";
 import Header from "@/components/Header/Header";
 import Image from "next/image";
@@ -10,7 +11,7 @@ export default function Home() {
           <Header />
         </div>
 
-        <div className="relative w-full h-auto">
+        {/* <div className="relative w-full h-auto">
           <Image
             src={Banners["BannerImage"]}
             alt="Voters"
@@ -22,6 +23,9 @@ export default function Home() {
           <button className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-black text-sm sm:text-base md:text-lg w-3/4 sm:w-2/3 md:w-1/2 lg:w-1/3 py-3 rounded-lg font-semibold hover:bg-green-600">
             Voting Has Not Started Yet!
           </button>
+        </div> */}
+        <div className="relative w-full h-auto">
+          <Login />
         </div>
       </div>
     </>
