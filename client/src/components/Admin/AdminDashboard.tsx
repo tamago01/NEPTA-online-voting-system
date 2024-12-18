@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import Header from "../Header/Header";
 import { useHandleVotes } from "@/hooks/useHandleVotes";
+import { useRouter } from "next/navigation";
 
 interface Candidate {
   name: string;
@@ -19,8 +20,22 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
-
   const { getResults } = useHandleVotes();
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    console.log("Token found:", token);
+
+    if (!token) {
+      router.push("/"); // Redirect to login if no token found
+    } else {
+      const user = JSON.parse(localStorage.getItem("user") ?? "");
+      if (!user || user.email !== "admin@admin.com") {
+        router.push("/dashboard");
+      }
+      // Optional: Validate token with server
+    }
+  }, []);
 
   useEffect(() => {
     const fetchResults = async () => {

@@ -1,8 +1,11 @@
+"use client";
+
 import Header from "@/components/Header/Header";
 import Results from "@/components/Otp/Results";
 import React from "react";
 
 const page = () => {
+ 
   return (
     <div className=" relative">
       <div className="bg-slate-100  sticky top-0 w-full mx-auto">

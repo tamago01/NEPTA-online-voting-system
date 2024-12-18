@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { candidatePhotos } from "../Constants/Photos";
 import OtpModal from "../Otp/OtpModal";
 import { useTimer } from "@/app/context/TimeProvider";
-import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 type CandidateCategories = {
@@ -77,10 +76,32 @@ const Dashboard = () => {
   const [otp, setOtp] = useState("");
   const router = useRouter();
   const { timerValue, startTimer, showBackdrop } = useTimer();
-  const { user } = useAuth();
   const [otpError, setOtpError] = useState<string | null>(null);
   const [isOtpSending, setIsOtpSending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      router.push("/login"); // Redirect to login if no token found
+    } else {
+      console.log("Token found:", token);
+      // Optional: Validate token with server
+    }
+  }, []);
+
+  useEffect(() => {
+    const userSaved = localStorage.getItem("user");
+    // const storedAuthToken = localStorage.getItem("authToken");
+
+    if (userSaved) {
+      try {
+        setUser(JSON.parse(userSaved));
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
+    }
+  }, []);
 
   const [selectedCandidates, setSelectedCandidates] = useState<
     Record<keyof CandidateCategories, string[]>
@@ -94,91 +115,62 @@ const Dashboard = () => {
     return initialState;
   });
 
- 
-  // const handleCheckboxChange = (
-  //   category: keyof CandidateCategories,
-  //   candidate: string
-  // ) => {
-  //   setSelectedCandidates((prev) => {
-  //     if (candidates[category].length > 1) {
-  //       const currentSelected = prev[category];
-  //       const isCurrentlySelected = currentSelected.includes(candidate);
-
-  //       if (isCurrentlySelected) {
-  //         return {
-  //           ...prev,
-  //           [category]: [],
-  //         };
-  //       }
-
-  //       return {
-  //         ...prev,
-  //         [category]: [candidate],
-  //       };
-  //     }
-
-  //     return prev;
-  //   });
-  // };
-  
   const handleCheckboxChange = (
     category: keyof CandidateCategories,
     candidate: string
   ) => {
     setSelectedCandidates((prev) => {
-     
-      if (category === 'CommitteeMemberOpen' || category === 'NationalCommitteeMember') {
+      if (
+        category === "CommitteeMemberOpen" ||
+        category === "NationalCommitteeMember"
+      ) {
         const currentSelected = prev[category];
         const isCurrentlySelected = currentSelected.includes(candidate);
-  
+
         if (isCurrentlySelected) {
-          
           return {
             ...prev,
-            [category]: currentSelected.filter(name => name !== candidate)
+            [category]: currentSelected.filter((name) => name !== candidate),
           };
         }
-  
-     
+
         if (currentSelected.length < 5) {
           return {
             ...prev,
-            [category]: [...currentSelected, candidate]
+            [category]: [...currentSelected, candidate],
           };
         }
-  
-       
+
         return {
           ...prev,
-          [category]: [...currentSelected.slice(1), candidate]
+          [category]: [...currentSelected.slice(1), candidate],
         };
       }
-  
-      
+
       if (candidates[category].length > 1) {
         const currentSelected = prev[category];
         const isCurrentlySelected = currentSelected.includes(candidate);
-  
+
         if (isCurrentlySelected) {
           return {
             ...prev,
             [category]: [],
           };
         }
-  
+
         return {
           ...prev,
           [category]: [candidate],
         };
       }
-  
+
       return prev;
     });
   };
 
   console.log("user", user);
   const handleSendOtp = async () => {
-    if (!user?.user?.email) {
+    if (!user?.email) {
       setOtpError("No user email found");
       return;
     }
@@ -187,7 +179,7 @@ const Dashboard = () => {
       setIsOtpSending(true);
       setOtpError(null);
 
-      await sendOtp(user?.user?.email);
+      await sendOtp(user?.email);
 
       setIsModalOpen(true);
     } catch (err) {
@@ -200,14 +192,14 @@ const Dashboard = () => {
 
   // In OTP Verification
   const handleSubmit = async () => {
-    if (!user?.user?.email) {
+    if (!user?.email) {
       setOtpError("No user email found");
       return;
     }
 
     try {
       setIsLoading(true);
-      await verifyOtp(otp, user?.user?.email);
+      await verifyOtp(otp, user?.email);
 
       await postVote(selectedCandidates);
 
@@ -228,7 +220,7 @@ const Dashboard = () => {
       .toString()
       .padStart(2, "0")}`;
   };
-  
+
   return (
     <div className="px-12 lg:mt- ld:px-24 py-10 mx-auto">
       {!showBackdrop && (
@@ -236,7 +228,7 @@ const Dashboard = () => {
           {timerValue > 0 ? (
             <div className="text-center text-white">
               <h1 className="text-3xl font-bold mb-4">
-                {user?.user?.email === "test@gmail.com" && (
+                {user?.email === "test@gmail.com" && (
                   <button
                     onClick={startTimer}
                     className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded mb-4"
@@ -340,7 +332,7 @@ const Dashboard = () => {
             </div>
           </div>
         ))}
-       
+
         <div className="text-center mt-8">
           <button
             type="submit"

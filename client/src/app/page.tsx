@@ -1,9 +1,24 @@
+"use client";
 import Login from "@/components/Auth/Login";
 import { Banners } from "@/components/Constants/Photos";
 import Header from "@/components/Header/Header";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    console.log("Token found:", token);
+
+    if (!token) {
+    } else {
+      router.push("/dashboard"); // Redirect to login if no token found
+      // Optional: Validate token with server
+    }
+  }, []);
+
   return (
     <>
       <div>

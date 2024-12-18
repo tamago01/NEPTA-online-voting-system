@@ -2,12 +2,27 @@
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
 
 const Header = () => {
-  const { user, logout } = useAuth();
-  console.log("user", user);
+  const { logout } = useAuth();
+  // const [setAuthToken] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const userSaved = localStorage.getItem("user");
+    // const storedAuthToken = localStorage.getItem("authToken");
+    console.log("userSaved", userSaved);
+
+    if (userSaved) {
+      try {
+        setUser(JSON.parse(userSaved));
+        console.log("~user~", user);
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+      }
+    }
+  }, []);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -28,7 +43,7 @@ const Header = () => {
       </label>
 
       <div className="flex items-center p-4 relative">
-        {user?.user ? (
+        {user ? (
           <>
             <svg
               width="28"
@@ -41,7 +56,7 @@ const Header = () => {
             </svg>
 
             <div className="ml-2 text-sm md:text-lg font-semibold">
-              {user?.user?.email}
+              {user?.email}
             </div>
 
             <button onClick={toggleDropdown} className="ml-2 p-2">

@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface WinnerData {
@@ -9,6 +10,16 @@ interface WinnerData {
 
 const Results = () => {
   const [winnersData, setWinnersData] = useState<WinnerData[]>([]);
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      router.push("/login"); // Redirect to login if no token found
+    } else {
+      console.log("Token found:", token);
+      // Optional: Validate token with server
+    }
+  }, []);
 
   useEffect(() => {
     const snapshot = localStorage.getItem("winnersSnapshot");
@@ -38,7 +49,7 @@ const Results = () => {
                   Winner: {winner.winnerName}
                 </div>
                 <span className="mt-2 block text-red-500 font-semibold">
-                   {winner.votes} votes
+                  {winner.votes} votes
                 </span>
               </div>
             ))}

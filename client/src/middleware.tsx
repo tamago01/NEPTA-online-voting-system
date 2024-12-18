@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { verifyToken } from "../lib/auth";
 
 export const config = {
   runtime: "nodejs",
@@ -8,31 +7,31 @@ export const config = {
 
 export async function middleware(req: NextRequest) {
   console.log("Middleware triggered for path:", req.nextUrl.pathname);
+  return NextResponse.next();
 
-  const token = req.cookies.get("auth-token")?.value;
-  const publicPaths = ["/", "/login", "/register"];
+  // const token = req.cookies.get("auth-token")?.value;
+  // const publicPaths = ["/", "/login", "/register"];
 
-  if (publicPaths.includes(req.nextUrl.pathname)) {
-    return NextResponse.next();
-  }
+  // if (publicPaths.includes(req.nextUrl.pathname)) {
+  // }
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  // if (!token) {
+  //   return NextResponse.redirect(new URL("/", req.url));
+  // }
 
-  try {
-    const decoded = await verifyToken(token);
-    console.log("Token is valid.");
+  // try {
+  //   const decoded = await verifyToken(token);
+  //   console.log("Token is valid.");
 
-    const response = NextResponse.next();
+  //   const response = NextResponse.next();
 
-    if (decoded.email) {
-      response.headers.set("x-user-email", decoded.email);
-    }
+  //   if (decoded.email) {
+  //     response.headers.set("x-user-email", decoded.email);
+  //   }
 
-    return response;
-  } catch (err) {
-    console.error("Token validation failed:", err);
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  //   return response;
+  // } catch (err) {
+  //   console.error("Token validation failed:", err);
+  //   return NextResponse.redirect(new URL("/", req.url));
+  // }
 }

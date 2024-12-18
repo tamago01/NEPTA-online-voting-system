@@ -12,6 +12,7 @@ export function useHandleVotes() {
 
   const postVote = async (votes: Record<string, string[]>) => {
     try {
+      const Token = localStorage.getItem("authToken");
       console.log("Sending payload:", votes);
       setLoading(true);
       setError(null);
@@ -22,8 +23,8 @@ export function useHandleVotes() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${Token}`,
           },
-          credentials: "include",
           body: JSON.stringify({ votes }),
         }
       );
