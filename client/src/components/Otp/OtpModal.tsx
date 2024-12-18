@@ -18,8 +18,8 @@ const OtpModal = ({ isOpen, onClose, selectedCandidates }: OtpModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("selectedCandidates", selectedCandidates);
-    await postVote(selectedCandidates);
-    router.push("/results");
+    // await postVote(selectedCandidates);
+    // router.push("/results");
 
     // onClose();
   };
