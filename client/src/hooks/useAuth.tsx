@@ -91,12 +91,11 @@ export function useAuth() {
       if (response.ok) {
         setSuccess(true);
         setUser(data);
-        // Store user in localStorage for persistence
+
         localStorage.setItem("user", JSON.stringify(data));
         console.log("usedatar", data);
         router.push("/dashboard");
       } else {
-        // Ensure error message is displayed
         const errorMessage = data.message || "Login failed";
         setError(errorMessage);
         console.error("Login failed:", errorMessage);
@@ -128,7 +127,7 @@ export function useAuth() {
 
       if (response.ok) {
         setUser(null);
-        // Remove user from localStorage
+
         localStorage.removeItem("user");
         router.push("/");
       } else {
