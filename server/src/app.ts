@@ -24,8 +24,8 @@ export class App {
     // Specify the exact origin for CORS when credentials are included
     this.app.use(
       cors({
-        origin: ["https://nepta-client.vercel.app", "http://localhost:3000"],
-
+        // origin: ["https://nepta-client.vercel.app", "http://localhost:3000"],
+        origin: '*',
         credentials: true,
       })
     );
