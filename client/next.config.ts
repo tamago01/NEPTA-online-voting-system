@@ -3,7 +3,7 @@ const nextConfig = {
 
   experimental: {
     serverActions: {
-      allowedOrigins: ["hhttps://nepta-online-voting-system-4p84.vercel.app",
+      allowedOrigins: ["https://nepta-online-voting-system-4p84.vercel.app",
         "https://nepta.onrender.com","*"
       ],
     },
