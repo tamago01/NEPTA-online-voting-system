@@ -202,7 +202,12 @@ const Dashboard = () => {
       await verifyOtp(otp, user?.email);
 
       await postVote(selectedCandidates);
-
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        parsedUser.hasVoted = true;
+        localStorage.setItem("user", JSON.stringify(parsedUser));
+      }
       setIsModalOpen(false);
       router.push("/results");
     } catch (err) {

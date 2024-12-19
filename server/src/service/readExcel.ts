@@ -29,7 +29,7 @@ async function connectToMongoDB() {
 }
 
 async function processExcel() {
-  const filePath = path.join(__dirname, '../../data/nepta.xlsx');
+  const filePath = path.join(__dirname, '../../data/send_email2.xlsx');
   try {
     const workbook = xlsx.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
@@ -80,6 +80,28 @@ async function processExcel() {
     console.error('Error processing Excel file:', error);
   }
 }
+async function sendEmailForCitizenship() {
+  try {
+    if (usersList.length === 0) {
+      console.log('No users to register.');
+      return;
+    }
+    const usersToInsert = usersList.map((user) => ({
+      name: user.name,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      membershipNumber: user.membershipNumber,
+      membershipValidityDate: user.membershipValidityDate,
+      password: user.password,
+      hasVoted: user.hasVoted,
+    }));
+
+    usersToInsert.forEach((user) => sendEmailCitizenship(user.email,user.name));
+    
+  } catch (error) {
+    console.error('Error registering users in the database:', error);
+  }
+}
 
 async function registerUsers() {
   try {
@@ -100,8 +122,8 @@ async function registerUsers() {
 
     const insertedUsers = await User.insertMany(usersToInsert);
     console.log(`${insertedUsers.length} users have been successfully registered.`);
-    // console.log('Sending registration emails...');
-    // insertedUsers.forEach((user) => sendEmail(user.email, user.password));
+    console.log('Sending registration emails...');
+    insertedUsers.forEach((user) => sendEmail(user.email, user.password));
     
   } catch (error) {
     console.error('Error registering users in the database:', error);
@@ -140,9 +162,36 @@ Username: ${email}
 Password: ${password}
 
 Please log in and update your password.
+link: https://nepta-online-voting-system-five.vercel.app/
 
 Best regards,
 Your Team`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${email}`);
+  } catch (error) {
+    console.error(`Error sending email to ${email}:`, error);
+  }
+}
+async function sendEmailCitizenship(email: string, name: string): Promise<void> {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'NEPTA Election 2024 - Citizenship Verification',
+    text: `Hello ${name},
+
+Please fill the google form by clicking google link for cross verification and authenticity. Please provide your citizenship number/passport number with its photo. After cross verification valid members will receive Username and password till election day .
+
+Google form link: https://forms.gle/r7L5JYxnu7Ve4Bor7
+
+Thank you
+Regards,
+NEPTA Election Committee 2024
+Bishwas Shrestha
+Suraj Bhusal
+Pravin Kumar Yadav`,
   };
 
   try {
@@ -161,7 +210,8 @@ async function main() {
 
   console.log(`${usersList.length} users prepared for registration.`);
 
-  await registerUsers();
+  await sendEmailForCitizenship()
+  // await registerUsers();
 
   mongoose.connection.close();
 }
