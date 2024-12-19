@@ -25,7 +25,7 @@ export default function Home() {
         <div className="bg-slate-100 sticky top-0 w-full z-10">
           <Header />
         </div>
-        <div className="relative w-full  h-auto">
+        <div className="relative w-full h-auto">
           <Login />
         </div>
       </div>

@@ -133,7 +133,7 @@ const AdminDashboard = () => {
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <Tabs defaultValue="Results">
-            <TabsList className="flex flex-wrap justify-center  p-2 border-b">
+            <TabsList className="flex flex-wrap justify-center p-2 border-b">
               <TabsTrigger
                 className="px-4 py-2 border text-sm sm:text-base data-[state=active]:bg-green-400 rounded-md transition-colors"
                 value="Results"
@@ -158,42 +158,48 @@ const AdminDashboard = () => {
                   <div key={category._id} className="mb-6">
                     <h3 className="mb-4 text-lg font-bold text-gray-700 border-b pb-2">
                       {categoryNames[category._id] || category._id}
-                      {category.candidates.length === 1 && (
-                        <span className="text-red-500"> - Winner</span>
-                      )}
+                      
                     </h3>
                     <div className="space-y-2">
                       {sortedCandidates.map((candidate) => (
                         <div
                           key={candidate.name}
-                          className={`flex justify-between items-center p-3 rounded-lg ${
+                          className={`flex flex-col sm:flex-row justify-between md:items-center p-3 rounded-lg ${
                             candidate.voteCount === highestVote
                               ? "bg-green-100"
                               : "bg-gray-50"
                           }`}
                         >
-                          <Image
-                            src={
-                              candidatePhotos[candidate?.name] ||
-                              "/images/user.png"
-                            }
-                            alt={candidate.name}
-                            width={200}
-                            height={200}
-                            className="w-32 h-32 object-cover rounded-full"
-                          />
-                          <span className="text-base font-semibold text-gray-700">
-                            {candidate.name}
-                          </span>
-                          <span
-                            className={`text-base ${
-                              candidate.voteCount === highestVote
-                                ? "text-red-600 font-bold"
-                                : "text-gray-900"
-                            }`}
-                          >
-                            {candidate.voteCount} votes
-                          </span>
+                          <div className="flex items-center gap-4 sm:gap-10">
+                            <Image
+                              src={
+                                candidatePhotos[candidate?.name] ||
+                                "/images/user.png"
+                              }
+                              alt={candidate.name}
+                              width={100}
+                              height={100}
+                              className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full"
+                            />
+                            <span className="text-base sm:text-lg font-semibold text-gray-700">
+                              {candidate.name}
+                            </span>
+                          </div>
+                          {category.candidates.length > 1 ? (
+                            <span
+                              className={`max-sm:text-right text-base  ${
+                                candidate.voteCount === highestVote
+                                  ? "text-red-600 font-bold"
+                                  : "text-gray-900"
+                              }`}
+                            >
+                              {candidate.voteCount} votes
+                            </span>
+                          ) : (
+                            <span className="max-sm:text-right  text-red-600 font-bold">
+                              Winner
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -218,25 +224,37 @@ const AdminDashboard = () => {
                     return (
                       <div
                         key={category._id}
-                        className="flex justify-between items-center p-3 border-b last:border-b-0 bg-white rounded-lg"
+                        className="flex flex-col sm:flex-row justify-between items-center p-3 border-b last:border-b-0 bg-white rounded-lg"
                       >
-                        <Image
-                          src={
-                            candidatePhotos[winner.name] || "/images/user.png"
-                          }
-                          alt={winner.name}
-                          width={200}
-                          height={200}
-                          className="w-32 h-32 rounded-full"
-                        />
-                        <span className="font-semibold text-gray-800 text-base">
-                          {categoryNames[category._id] || category._id}:{" "}
-                          <span className="ml-2">{winner.name}</span>
-                        </span>
-
-                        <span className="font-bold text-red-600 text-base">
-                          {winner.voteCount} votes
-                        </span>
+                        <div className="flex items-center gap-4 sm:gap-10">
+                          <Image
+                            src={
+                              candidatePhotos[winner.name] || "/images/user.png"
+                            }
+                            alt={winner.name}
+                            width={100}
+                            height={100}
+                            className="w-24 h-24 sm:w-32 sm:h-32 rounded-full"
+                          />
+                          <span className="font-semibold text-gray-800 text-base sm:text-lg">
+                            {categoryNames[category._id] || category._id}:{" "}
+                            <span className="ml-2">{winner.name}</span>
+                          </span>
+                        </div>
+                        {category.candidates.length > 1 ? (
+                          <div className="w-full flex flex-col items-end ">
+                            <span className=" font-bold text-red-600 text-lg  underline">
+                              Winner
+                            </span>
+                            <span className="font-bold text-red-600 text-base ">
+                              {winner.voteCount} votes
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="w-full text-right font-bold text-red-600 text-lg sm:text-xl underline">
+                            Winner
+                          </span>
+                        )}
                       </div>
                     );
                   })}

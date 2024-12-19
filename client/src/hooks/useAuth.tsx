@@ -24,7 +24,7 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const router:any = useRouter();
+  const router: ReturnType<typeof useRouter> = useRouter();
 
   const login = async (email: string, password: string) => {
     setLoading(true);
@@ -52,7 +52,9 @@ export function useAuth() {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("authToken", data.user.token);
         
-        router.push("/dashboard");
+        (async () => {
+          await router.push("/dashboard");
+        })();
       } else {
         setError(data.message || "Login failed");
       }
@@ -106,7 +108,7 @@ export function useAuth() {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    router.push("/");
     localStorage.removeItem("authToken");
     window.location.href = "/";
   };

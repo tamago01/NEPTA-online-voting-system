@@ -4,8 +4,8 @@ interface OtpModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  data: string;
-  setData: (otp: string) => void;
+  otp: string;
+  setOtp: (otp: string) => void;
   error: string | null;
   setError: (error: string | null) => void;
   isLoading: boolean;
@@ -15,8 +15,8 @@ const OtpModal: React.FC<OtpModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  data,
-  setData,
+  otp,
+  setOtp,
   error,
   setError,
   isLoading,
@@ -24,15 +24,15 @@ const OtpModal: React.FC<OtpModalProps> = ({
   const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     
-    if (/^\d*$/.test(value) && value.length <= 6) {
-      setData(value);
+    if (/^\d{0,6}$/.test(value)) {
+      setOtp(value);
       setError(null);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (data.length !== 6) {
+    if (otp.length !== 6) {
       setError("Please enter a 6-digit OTP");
       return;
     }
@@ -51,7 +51,7 @@ const OtpModal: React.FC<OtpModalProps> = ({
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            value={data}
+            value={otp}
             onChange={handleOtpChange}
             placeholder="Enter 6-digit OTP"
             className={`w-full p-3 border rounded-lg ${

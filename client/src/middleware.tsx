@@ -6,7 +6,7 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
-  console.log("Middleware triggered for path:", req.nextUrl.pathname);
+ 
   return NextResponse.next();
 
   // const token = req.cookies.get("auth-token")?.value;

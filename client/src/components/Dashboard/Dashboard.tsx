@@ -402,8 +402,8 @@ const Dashboard = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
-        data={otp}
-        setData={setOtp}
+        otp={otp}
+        setOtp={setOtp}
         error={otpError}
         setError={setOtpError}
         isLoading={isLoading}
