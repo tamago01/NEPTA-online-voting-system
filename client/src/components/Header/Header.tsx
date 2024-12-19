@@ -28,8 +28,8 @@ const Header = () => {
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   return (
-    <div className="w-full h-32 flex justify-between items-center mx-auto border-b py-3 px-4 bg-gradient-to-r from-white via-green-100 to-green-300 shadow-sm">
-      <Link href="/" className="md:ml-10">
+    <div className="w-full h-32 flex justify-between items-center mx-auto border-b py-3 pl-8 md:pl-20 lg:pr-32 bg-gradient-to-r from-white via-green-100 to-green-300 shadow-sm">
+      <Link href="/" className="">
         <Image
           src="/images/nepta.png"
           alt="Logo"
