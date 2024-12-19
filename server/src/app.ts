@@ -18,15 +18,23 @@ export class App {
   private async connectDB(): Promise<void> {
     await mongodbConnection();
   }
+
   private setMiddlewares(): void {
     this.app.use(express.json());
 
-    // Specify the exact origin for CORS when credentials are included
-    this.app.use(
-      cors()
-    );
+    // CORS configuration: Allow requests only from https://www.neptaelection.com
+    const corsOptions = {
+      origin: 'https://www.neptaelection.com',  // Allow frontend domain
+      methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],  // Allowed HTTP methods
+      allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers
+      credentials: true,  // Allow cookies/credentials
+    };
 
-    // Handle preflight requests for OPTIONS
+    // Use CORS middleware with custom options
+    this.app.use(cors(corsOptions));
+
+    // Handle preflight requests for OPTIONS (CORS preflight)
+    this.app.options('*', cors(corsOptions)); // This handles OPTIONS requests globally
 
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
@@ -39,6 +47,7 @@ export class App {
     this.app.use("/auth", authRoutes);
     this.app.use("/votes", votesRoutes);
 
+    // Error handling middleware
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         console.error(err);
@@ -49,6 +58,7 @@ export class App {
       }
     );
   }
+
   public listen(port: number): void {
     this.app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
