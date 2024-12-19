@@ -42,7 +42,7 @@ export class App {
 
   private setRoutes(): void {
     this.app.get("/", (req: Request, res: Response) => {
-      res.json({ message: "Server is running!" });
+      res.json({ message: "Server is running! NewCache" });
     });
     this.app.use("/auth", authRoutes);
     this.app.use("/votes", votesRoutes);
