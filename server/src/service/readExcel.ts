@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 import { User } from '../auth/auth.model';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-dotenv.config();
+dotenv.config()
+
 let usersList: Array<{
   name: string;
   email: string;
@@ -14,22 +15,49 @@ let usersList: Array<{
   password: string;
   hasVoted: boolean;
 }> = [];
+let firstHalfUsersList: Array<{
+  name: string;
+  email: string;
+  phoneNumber: string;
+  membershipNumber: string;
+  membershipValidityDate: string;
+  password: string;
+  hasVoted: boolean;
+}> = [];
 
-// MongoDB Connection Function
-async function connectToMongoDB() {
-  try {
-    await mongoose.connect(process.env.MONGO_URI as string, {
-      serverSelectionTimeoutMS: 60000,
-    });
-    console.log('MongoDB connected successfully');
-  } catch (error) {
-    console.error('MongoDB connection failed:', error);
-    process.exit(1);
-  }
+let secondHalfUsersList: Array<{
+  name: string;
+  email: string;
+  phoneNumber: string;
+  membershipNumber: string;
+  membershipValidityDate: string;
+  password: string;
+  hasVoted: boolean;
+}> = [];
+
+function divideAndStoreUsers(usersList: Array<{
+  name: string;
+  email: string;
+  phoneNumber: string;
+  membershipNumber: string;
+  membershipValidityDate: string;
+  password: string;
+  hasVoted: boolean;
+}>) {
+  const midIndex = Math.ceil(usersList.length / 2);
+  
+  firstHalfUsersList = usersList.slice(0, midIndex);
+  secondHalfUsersList = usersList.slice(midIndex);
+
+  console.log(`First half stored: ${firstHalfUsersList.length} users.`);
+  console.log(`Second half stored: ${secondHalfUsersList.length} users.`);
 }
 
+console.log('First Half Users:', firstHalfUsersList);
+console.log('Second Half Users:', secondHalfUsersList);
+
 async function processExcel() {
-  const filePath = path.join(__dirname, '../../data/send_email2.xlsx');
+  const filePath = path.join(__dirname, '../../data/send_email.xlsx');
   try {
     const workbook = xlsx.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
@@ -66,7 +94,7 @@ async function processExcel() {
           phoneNumber: phoneNumber || "",
           membershipNumber,
           membershipValidityDate,
-          password: generateRandomPassword(),
+          password: "generateRandomPassword",
           hasVoted: false,
         };
         usersList.push(newUser);
@@ -80,63 +108,7 @@ async function processExcel() {
     console.error('Error processing Excel file:', error);
   }
 }
-async function sendEmailForCitizenship() {
-  try {
-    if (usersList.length === 0) {
-      console.log('No users to register.');
-      return;
-    }
-    const usersToInsert = usersList.map((user) => ({
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      membershipNumber: user.membershipNumber,
-      membershipValidityDate: user.membershipValidityDate,
-      password: user.password,
-      hasVoted: user.hasVoted,
-    }));
 
-    usersToInsert.forEach((user) => sendEmailCitizenship(user.email,user.name));
-    
-  } catch (error) {
-    console.error('Error registering users in the database:', error);
-  }
-}
-
-async function registerUsers() {
-  try {
-    if (usersList.length === 0) {
-      console.log('No users to register.');
-      return;
-    }
-
-    const usersToInsert = usersList.map((user) => ({
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      membershipNumber: user.membershipNumber,
-      membershipValidityDate: user.membershipValidityDate,
-      password: user.password,
-      hasVoted: user.hasVoted,
-    }));
-
-    const insertedUsers = await User.insertMany(usersToInsert);
-    console.log(`${insertedUsers.length} users have been successfully registered.`);
-    console.log('Sending registration emails...');
-    insertedUsers.forEach((user) => sendEmail(user.email, user.password));
-    
-  } catch (error) {
-    console.error('Error registering users in the database:', error);
-  }
-}
-
-// Function to Generate a Random Password
-function generateRandomPassword(): string {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  return Array.from({ length: 6 }, () =>
-    characters.charAt(Math.floor(Math.random() * characters.length))
-  ).join('');
-}
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -147,33 +119,47 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false
+  },
+  pool: true, // Use pooled connections
+  maxConnections: 3, // Limit concurrent connections
+  rateDelta: 1000, // Minimum time between messages
+  rateLimit: 3 //
 });
 
-async function sendEmail(email: string, password: string): Promise<void> {
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Your Account Registration Details',
-    text: `Hello,
+async function sendEmailsToUsers(userList: Array<{
+  name: string;
+  email: string;
+  phoneNumber: string;
+  membershipNumber: string;
+  membershipValidityDate: string;
+  password: string;
+  hasVoted: boolean;
+}>) {
+  for (const [index, user] of userList.entries()) {
+    try {
+      // Send email
+      await sendEmailCitizenship(user.email, user.name,);
 
-Your account has been successfully registered. Below are your credentials:
+      console.log(`Email sent to ${user.email} (${index + 1}/${userList.length})`);
 
-Username: ${email}
-Password: ${password}
-
-Please log in and update your password.
-link: https://nepta-online-voting-system-five.vercel.app/
-
-Best regards,
-Your Team`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${email}`);
-  } catch (error) {
-    console.error(`Error sending email to ${email}:`, error);
+      // Delay for 1 second before sending the next email
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+    } catch (error) {
+      console.error(`Failed to send email to ${user.email}:`, error);
+    }
   }
+}
+
+async function sendAllEmails() {
+  console.log('Sending emails to the first half of users...');
+  await sendEmailsToUsers(firstHalfUsersList);
+
+  console.log('Sending emails to the second half of users...');
+  await sendEmailsToUsers(secondHalfUsersList);
+
+  console.log('All emails sent successfully!');
 }
 async function sendEmailCitizenship(email: string, name: string): Promise<void> {
   const mailOptions = {
@@ -202,20 +188,18 @@ Pravin Kumar Yadav`,
   }
 }
 
-// Main Function to Execute Workflow
+
 async function main() {
-  await connectToMongoDB();
 
-  await processExcel();
+await processExcel();
+divideAndStoreUsers(usersList);
+await sendAllEmails();
 
-  console.log(`${usersList.length} users prepared for registration.`);
 
-  await sendEmailForCitizenship()
+
+  // await sendEmailForCitizenship()
   // await registerUsers();
 
-  mongoose.connection.close();
 }
-
-// Execute Main Function
 main().catch((error) => console.error('Error in main execution:', error));
-//npx ts-node src/service/readExcel.ts  
+
