@@ -24,7 +24,7 @@ export class App {
 
     // CORS configuration: Allow requests only from https://www.neptaelection.com
     const corsOptions = {
-      origin: 'https://www.neptaelection.com',  // Allow frontend domain
+      origin: '*',  // Allow frontend domain
       methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],  // Allowed HTTP methods
       allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers
       credentials: true,  // Allow cookies/credentials
