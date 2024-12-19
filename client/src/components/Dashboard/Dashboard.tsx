@@ -296,6 +296,21 @@ const Dashboard = () => {
                 {names.length === 1 && (
                   <span className="text-red-500"> - Winner</span>
                 )}
+                {(category === "CommitteeMemberOpen" ||
+                  category === "NationalCommitteeMember") && (
+                  <span className="max-sm:text-sm text-lg text-gray-500 italic">
+                    {" "}
+                    (maximum - 5)
+                  </span>
+                )}
+                {names.length > 1 &&
+                  category !== "CommitteeMemberOpen" &&
+                  category !== "NationalCommitteeMember" && (
+                    <span className="max-sm:text-sm text-lg text-gray-500 italic">
+                      {" "}
+                      (maximum - 1)
+                    </span>
+                  )}
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
