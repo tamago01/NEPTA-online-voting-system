@@ -43,11 +43,11 @@ export const candidates: CandidateCategories = {
   VicePresidentFemale: ["Manju Gyawali"],
   SecretaryGeneral: ["Subarna Thapa Chhetri"],
   Secretary: ["Bibek Ghimire", "Jyanendra Jha"],
-  Treasurer: ["Sujit Yadav", "Sujeet Singh"],
-  CoTreasurer: ["Om Prakash Shah", "Ekina Khadka"],
+  Treasurer: ["Sujit Kumar Yadav", "Sujeet Singh"],
+  CoTreasurer: ["Om Prakash Sah", "Ekina Khadka"],
   CommitteeMemberOpen: [
     "Ujjwal Dotel",
-    "UmaShankar Shah",
+    "Umashankar Shah",
     "Saugat Shrestha",
     "Aashish Gho Shrestha",
     "Anup Acharya",
@@ -190,6 +190,27 @@ const Dashboard = () => {
   };
 
   // In OTP Verification
+  // const handleSubmit = async () => {
+  //   if (!user?.email) {
+  //     setOtpError("No user email found");
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsLoading(true);
+  //     await verifyOtp(otp, user?.email);
+
+  //     await postVote(selectedCandidates);
+
+  //     setIsModalOpen(false);
+  //     router.push("/results");
+  //   } catch (err) {
+  //     console.error("Verification failed", err);
+  //     setOtpError(err instanceof Error ? err.message : "Verification failed");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const handleSubmit = async () => {
     if (!user?.email) {
       setOtpError("No user email found");
@@ -201,7 +222,12 @@ const Dashboard = () => {
       await verifyOtp(otp, user?.email);
 
       await postVote(selectedCandidates);
-
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        parsedUser.hasVoted = true;
+        localStorage.setItem("user", JSON.stringify(parsedUser));
+      }
       setIsModalOpen(false);
       router.push("/results");
     } catch (err) {
@@ -252,8 +278,7 @@ const Dashboard = () => {
       )} */}
       <div className="md:px-10 mb-14 w-full border-b py-3 border-gray-300">
         <label className=" max-sm:text-[14px] md:text-[24px] font-bold  text-gray-700">
-          <a className="text-green-400">Welcome,</a> to the NEPTA election of
-          2024
+          <a className="text-green-400">Welcome,</a> to the NEPTA election 2024
         </label>
       </div>
       <form
@@ -268,6 +293,9 @@ const Dashboard = () => {
             <div className="border-l-4 border-red-400 px-6">
               <h2 className="mb-4 text-[18px] md:text-[24px] font-bold capitalize text-gray-700">
                 {category.replace(/([A-Z])/g, " $1").trim()}
+                {names.length === 1 && (
+                  <span className="text-red-500"> - Winner</span>
+                )}
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

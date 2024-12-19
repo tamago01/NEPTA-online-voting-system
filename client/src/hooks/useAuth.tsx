@@ -104,34 +104,12 @@ export function useAuth() {
     }
   }
 
-  const logout = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`,
-        {
-          method: "POST",
-        }
-      );
-
-      if (response.ok) {
-        setUser(null);
-        localStorage.removeItem("user");
-        localStorage.removeItem("authToken");
-        window.location.href = "/";
-      } else {
-        throw new Error("Failed to log out");
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
-    } finally {
-      setLoading(false);
-    }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    window.location.href = "/";
   };
+
   return { register, login, logout, user, loading, error, success };
 }

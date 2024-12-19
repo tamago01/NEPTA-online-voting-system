@@ -4,6 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import Header from "../Header/Header";
 import { useHandleVotes } from "@/hooks/useHandleVotes";
 import { useRouter } from "next/navigation";
+import { candidatePhotos } from "../Constants/Photos";
+import Image from "next/image";
 
 interface Candidate {
   name: string;
@@ -14,6 +16,21 @@ interface CategoryData {
   _id: string;
   candidates: Candidate[];
 }
+
+const categoryNames: Record<string, string> = {
+  president: "President",
+  vicepresident: "Vice President",
+  vicepresidentfemale: "Vice President Female",
+  secretarygeneral: "Secretary General",
+  secretary: "Secretary",
+  treasurer: "Treasurer",
+  cotreasurer: "Co Treasurer",
+  committeememberopen: "Committee Member Open",
+  committeememberfemale: "Committee Member Female",
+  committeemembermadheshi: "Committee Member Madheshi",
+  committeememberjanajati: "Committee Member Janajati",
+  nationalcommitteemember: "National Committee Member",
+};
 
 const AdminDashboard = () => {
   const [results, setResults] = useState<CategoryData[]>([]);
@@ -36,6 +53,7 @@ const AdminDashboard = () => {
     "committeememberjanajati",
     "nationalcommitteemember",
   ];
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     console.log("Token found:", token);
@@ -55,7 +73,7 @@ const AdminDashboard = () => {
       try {
         setLoading(true);
         const data = await getResults();
-        
+
         const categoryMap = data.reduce((map: any, category: any) => {
           map[category._id] = category;
           return map;
@@ -65,7 +83,6 @@ const AdminDashboard = () => {
           .map((id) => categoryMap[id])
           .filter(Boolean);
 
-       
         setResults(orderedResults);
       } catch (err) {
         setError("Failed to fetch results.");
@@ -85,7 +102,7 @@ const AdminDashboard = () => {
       );
       const winner = sortedCandidates[0];
       return {
-        category: category._id.replace(/([A-Z])/g, " $1").trim(),
+        category: categoryNames[category._id] || category._id,
         winnerName: winner.name,
         votes: winner.voteCount,
       };
@@ -140,10 +157,13 @@ const AdminDashboard = () => {
                 return (
                   <div key={category._id} className="mb-6">
                     <h3 className="mb-4 text-lg font-bold text-gray-700 border-b pb-2">
-                      {category._id.replace(/([A-Z])/g, " $1").trim()}
+                      {categoryNames[category._id] || category._id}
+                      {category.candidates.length === 1 && (
+                        <span className="text-red-500"> - Winner</span>
+                      )}
                     </h3>
                     <div className="space-y-2">
-                      {category.candidates.map((candidate) => (
+                      {sortedCandidates.map((candidate) => (
                         <div
                           key={candidate.name}
                           className={`flex justify-between items-center p-3 rounded-lg ${
@@ -152,6 +172,16 @@ const AdminDashboard = () => {
                               : "bg-gray-50"
                           }`}
                         >
+                          <Image
+                            src={
+                              candidatePhotos[candidate?.name] ||
+                              "/images/user.png"
+                            }
+                            alt={candidate.name}
+                            width={200}
+                            height={200}
+                            className="w-32 h-32 object-cover rounded-full"
+                          />
                           <span className="text-base font-semibold text-gray-700">
                             {candidate.name}
                           </span>
@@ -190,8 +220,17 @@ const AdminDashboard = () => {
                         key={category._id}
                         className="flex justify-between items-center p-3 border-b last:border-b-0 bg-white rounded-lg"
                       >
+                        <Image
+                          src={
+                            candidatePhotos[winner.name] || "/images/user.png"
+                          }
+                          alt={winner.name}
+                          width={200}
+                          height={200}
+                          className="w-32 h-32 rounded-full"
+                        />
                         <span className="font-semibold text-gray-800 text-base">
-                          {category._id.replace(/([A-Z])/g, " $1").trim()}:{" "}
+                          {categoryNames[category._id] || category._id}:{" "}
                           <span className="ml-2">{winner.name}</span>
                         </span>
 
