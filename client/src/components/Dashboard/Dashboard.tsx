@@ -294,7 +294,7 @@ const Dashboard = () => {
               <h2 className="mb-4 text-[18px] md:text-[24px] font-bold capitalize text-gray-700">
                 {category.replace(/([A-Z])/g, " $1").trim()}
                 {names.length === 1 && (
-                  <span className="text-red-500"> - Winner</span>
+                  <span className="text-green-500"> - Winner</span>
                 )}
                 {(category === "CommitteeMemberOpen" ||
                   category === "NationalCommitteeMember") && (
@@ -327,10 +327,10 @@ const Dashboard = () => {
                     className={`flex items-center gap-4 p-4 border rounded-lg cursor-pointer transition-colors duration-200 
               ${
                 isDisabled
-                  ? "bg-blue-200 cursor-not-allowed"
+                  ? "bg-green-200 cursor-not-allowed"
                   : "hover:bg-blue-100"
               }
-              ${isSelected ? "bg-blue-200" : ""}`}
+              ${isSelected ? "bg-blue-200 hover:bg-blue-100" : ""}`}
                   >
                     <input
                       type="checkbox"
@@ -410,7 +410,6 @@ const Dashboard = () => {
               "Vote Now"
             )}
           </button>
-          {otpError && <p className="text-red-500 mt-2 text-sm">{otpError}</p>}
         </div>
       </form>
       <OtpModal
