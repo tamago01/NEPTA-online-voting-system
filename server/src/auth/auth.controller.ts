@@ -60,6 +60,7 @@ export class AuthController {
           email: user.email,
           token: user.token,
           hasVoted: user.hasVoted,
+          phone: user.phone,
         },
       });
     } catch (error) {

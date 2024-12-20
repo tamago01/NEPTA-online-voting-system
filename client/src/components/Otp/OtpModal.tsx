@@ -47,6 +47,7 @@ const OtpModal: React.FC<OtpModalProps> = ({
         <h2 className="text-2xl font-bold mb-4">Enter OTP</h2>
         <p className="text-sm text-gray-600 mb-4">
           Please check your email and enter the 6-digit OTP
+          
         </p>
         <form onSubmit={handleSubmit}>
           <input

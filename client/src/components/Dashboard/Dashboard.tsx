@@ -178,7 +178,7 @@ const Dashboard = () => {
       setIsOtpSending(true);
       setOtpError(null);
 
-      await sendOtp(user?.email);
+      await sendOtp(user?.email, user?.phone ?? "");
 
       setIsModalOpen(true);
     } catch (err) {

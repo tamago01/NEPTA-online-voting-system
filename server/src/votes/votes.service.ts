@@ -164,7 +164,7 @@ export class VotesService {
     try {
       await emailService.sendOtpEmail(userEmail, otp);
       if(phone||phone.length>0){
-        await sendSMS.sendSmS(phone, "Your OTP is: " + otp);
+        await sendSMS.sendSmS(phone, "Nepta: Your OTP is: " + otp);
       }
       console.log(`OTP sent to email: ${userEmail}`);
     } catch (error) {
@@ -202,22 +202,6 @@ export class VotesService {
     }
     return otp;
   }
-  public async checkVotingStatus(): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    let votingStatus = false;
 
-    if (votingStatus) {
-      return {
-        success: true,
-        message: "Voting is open. Proceed.",
-      };
-    } else {
-      return {
-        success: false,
-        message: "Voting has not yet started or has ended.",
-      };
-    }
-  }
+
 }

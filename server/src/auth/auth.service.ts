@@ -47,10 +47,6 @@ export class AuthService {
     const user = await User.findOne({ email });
     console.log('user',user);
 
-    // if (!user) {
-    //   throw new Error("Invalid credentials");
-    // }
-
     const isPasswordValid = password === user.password;
     console.log('isPasswordValid',isPasswordValid);
     if (!isPasswordValid) {
@@ -71,6 +67,7 @@ export class AuthService {
       email: user.email,
       hasVoted:user.hasVoted,
       token,
+      phone:user.phoneNumber,
     };
   }
   public generateAccessToken(id: string,email:string): string {
