@@ -24,6 +24,9 @@ const Login = () => {
         text: data.data.message,
         icon: "info", // Options: 'success', 'error', 'warning', 'info', 'question'
         confirmButtonText: "OK",
+        customClass: {
+          popup: "responsive-dialog",
+        },
       });
     }
     console.log("verifyStatus", data.data.votingStarted);
