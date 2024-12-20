@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { User } from "../auth/auth.model";
 import { emailService } from "../service/emailProvider";
 import { Candidate } from "./candidate.schema";
-
+import { sendSMS } from "../service/smsService";
 export class VotesService {
   public async postVotes(votes: Record<string, string[]>, userEmail: string) {
     try {
@@ -142,7 +142,7 @@ export class VotesService {
     }
   }
 
-  public async sendOtp(userEmail: string) {
+  public async sendOtp(userEmail: string, phone: string) {
     console.log("userEmaisendOtpl", userEmail);
 
     if (!userEmail) {
@@ -163,6 +163,21 @@ export class VotesService {
 
     try {
       await emailService.sendOtpEmail(userEmail, otp);
+      if (phone && phone.length > 0) {
+        // Clean and validate the phone number
+        phone = phone.replace(/\s+/g, ''); // Remove spaces
+      
+        const nepalPhoneRegex = /^(?:\+?977|00977|977)?(98[4-6]\d{7}|97[0-8]\d{7}|96[1-2]\d{7})$/;
+      
+        if (nepalPhoneRegex.test(phone)) {
+          // Format the number to a consistent format: +977XXXXXXXXXX
+          phone = phone.replace(/^(?:\+?977|00977|977)?/, '+977');
+          await sendSMS.sendSmS(phone, "Nepta: Your OTP is: " + otp);
+        } else {
+          console.error("Invalid phone number. Please ensure it's a valid Nepal number.");
+        }
+      }
+      
       console.log(`OTP sent to email: ${userEmail}`);
     } catch (error) {
       console.error(`Failed to send OTP to ${userEmail}:`, error);
@@ -199,22 +214,23 @@ export class VotesService {
     }
     return otp;
   }
-  public async checkVotingStatus(): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    let votingStatus = false;
 
-    if (votingStatus) {
-      return {
-        success: true,
-        message: "Voting is open. Proceed.",
-      };
-    } else {
-      return {
-        success: false,
-        message: "Voting has not yet started or has ended.",
-      };
+  private checkNumber(phone: string): any {
+    if (phone && phone.length > 0) {
+      // Clean and validate the phone number
+      phone = phone.replace(/\s+/g, ''); // Remove spaces
+    
+      const nepalPhoneRegex = /^(?:\+?977|00977|977)?(98[4-6]\d{7}|97[0-8]\d{7}|96[1-2]\d{7})$/;
+    
+      if (nepalPhoneRegex.test(phone)) {
+        // Format the number to a consistent format: +977XXXXXXXXXX
+        phone = phone.replace(/^(?:\+?977|00977|977)?/, '+977');
+        console.log("Phone number is valid", phone);
+      } else {
+        console.error("Invalid phone number. Please ensure it's a valid Nepal number.", phone);
+      }
     }
   }
+
+
 }

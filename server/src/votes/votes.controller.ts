@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { VotesService } from "./votes.service";
+import { VotingStatus } from "./voting.status.schema";
 
 export class VotesController {
   private votesService: VotesService;
@@ -67,8 +68,9 @@ export class VotesController {
   public async sendOtp(_req: Request, res: Response): Promise<void> {
     try {
       console.log("req", _req.body.email);
+      const phone = _req.body.phone||"";
 
-      const data = await this.votesService.sendOtp(_req.body.email);
+      const data = await this.votesService.sendOtp(_req.body.email, phone);
       console.log("data", data);
       res.status(200).json(data);
     } catch (error) {
@@ -90,10 +92,35 @@ export class VotesController {
   }
   public async verifyStatus(req: Request, res: Response) {
     try {
-      const result = await this.votesService.checkVotingStatus();
-      res.status(200).json(result);
+      const { votingStarted, message } = req.body;
+    
+      try {
+        const votingStatus = await VotingStatus.findOneAndUpdate(
+          {}, 
+          { votingStarted, message },
+          { upsert: true, new: true }
+        );
+    
+        res.status(200).json({ success: true, data: votingStatus });
+      } catch (error) {
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  }
+
+  public async fetchVerifyStatus(req: Request, res: Response) {
+    try {
+      const votingStatus = await VotingStatus.findOne();
+  
+      if (!votingStatus) {
+        return res.status(404).json({ success: false, error: 'Voting status not found' });
+      }
+  
+      res.status(200).json({ success: true, data: votingStatus });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
   }
 }

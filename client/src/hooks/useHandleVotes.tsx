@@ -44,7 +44,7 @@ export function useHandleVotes() {
     }
   };
 
-  const sendOtp = async (email: string) => {
+  const sendOtp = async (email: string, phone: string) => {
     try {
       setLoading(true);
       setError(null);
@@ -56,7 +56,7 @@ export function useHandleVotes() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email, phone }),
         }
       );
 
@@ -131,7 +131,10 @@ export function useHandleVotes() {
       return [];
     }
   };
+
   const verifyStatus = async () => {
+    console.log("Verifying status...");
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/verify-status`

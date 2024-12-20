@@ -17,6 +17,7 @@ interface User {
   email: string;
   token: string;
   hasVoted: boolean;
+  phone: string;
 }
 
 export function useAuth() {
@@ -53,7 +54,7 @@ export function useAuth() {
         localStorage.setItem("authToken", data.user.token);
 
         (async () => {
-          await router.push("/dashboard");
+          router.push("/dashboard");
         })();
       } else {
         setError(data.message || "Login failed");
@@ -108,9 +109,9 @@ export function useAuth() {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
     localStorage.removeItem("authToken");
-    window.location.href = "/";
+    localStorage.removeItem("user");
+    router.push("/");
   };
 
   return { register, login, logout, user, loading, error, success };

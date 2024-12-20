@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import { User } from '../auth/auth.model';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import fs from 'fs';
+
 dotenv.config();
 let usersList: Array<{
   name: string;
@@ -29,7 +31,7 @@ async function connectToMongoDB() {
 }
 
 async function processExcel() {
-  const filePath = path.join(__dirname, '../../data/nepta.xlsx');
+  const filePath = path.join(__dirname, '../../data/demo.xlsx');
   try {
     const workbook = xlsx.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
@@ -65,7 +67,8 @@ async function processExcel() {
           email,
           phoneNumber: phoneNumber || "",
           membershipNumber,
-          membershipValidityDate,
+          // membershipValidityDate,
+           membershipValidityDate:decodeExcelDate(membershipValidityDate),
           password: generateRandomPassword(),
           hasVoted: false,
         };
@@ -80,6 +83,18 @@ async function processExcel() {
     console.error('Error processing Excel file:', error);
   }
 }
+function decodeExcelDate(excelDate) {
+  if (typeof excelDate !== 'number' || excelDate <= 0) {
+    console.error(`Invalid date value: ${excelDate}`);
+    return "Invalide date format"; // Return null for invalid dates
+  }
+
+  const excelEpoch = new Date(1899, 11, 30); // December 31, 1899
+  return new Date(excelEpoch.getTime() + excelDate * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]; // Returns date in 'YYYY-MM-DD' format
+}
+
 
 async function registerUsers() {
   try {
@@ -87,7 +102,16 @@ async function registerUsers() {
       console.log('No users to register.');
       return;
     }
+    const filePath = path.join(__dirname, 'usersList.json');
+    fs.writeFileSync(filePath, JSON.stringify(usersList, null, 2), 'utf-8');
+    console.log(`User list has been saved to ${filePath}`);
 
+    // Read back the data from the JSON file
+    const fileData = fs.readFileSync(filePath, 'utf-8');
+    const savedUsers = JSON.parse(fileData);
+
+    // Print the total length and the data inside the JSON file
+    console.log(`Total users in JSON file: ${savedUsers.length}`);
     const usersToInsert = usersList.map((user) => ({
       name: user.name,
       email: user.email,
@@ -100,8 +124,8 @@ async function registerUsers() {
 
     const insertedUsers = await User.insertMany(usersToInsert);
     console.log(`${insertedUsers.length} users have been successfully registered.`);
-    // console.log('Sending registration emails...');
-    // insertedUsers.forEach((user) => sendEmail(user.email, user.password));
+    console.log('Sending registration emails...');
+    insertedUsers.forEach((user) => sendEmail(user.email, user.password));
     
   } catch (error) {
     console.error('Error registering users in the database:', error);
@@ -139,6 +163,8 @@ Your account has been successfully registered. Below are your credentials:
 Username: ${email}
 Password: ${password}
 
+Voting Link: https://www.neptaelection.com/
+
 Please log in and update your password.
 
 Best regards,
@@ -159,7 +185,6 @@ async function main() {
 
   await processExcel();
 
-  console.log(`${usersList.length} users prepared for registration.`);
 
   await registerUsers();
 
