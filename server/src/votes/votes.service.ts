@@ -163,9 +163,21 @@ export class VotesService {
 
     try {
       await emailService.sendOtpEmail(userEmail, otp);
-      if(phone||phone.length>0){
-        await sendSMS.sendSmS(phone, "Nepta: Your OTP is: " + otp);
+      if (phone && phone.length > 0) {
+        // Clean and validate the phone number
+        phone = phone.replace(/\s+/g, ''); // Remove spaces
+      
+        const nepalPhoneRegex = /^(?:\+?977|00977|977)?(98[4-6]\d{7}|97[0-8]\d{7}|96[1-2]\d{7})$/;
+      
+        if (nepalPhoneRegex.test(phone)) {
+          // Format the number to a consistent format: +977XXXXXXXXXX
+          phone = phone.replace(/^(?:\+?977|00977|977)?/, '+977');
+          await sendSMS.sendSmS(phone, "Nepta: Your OTP is: " + otp);
+        } else {
+          console.error("Invalid phone number. Please ensure it's a valid Nepal number.");
+        }
       }
+      
       console.log(`OTP sent to email: ${userEmail}`);
     } catch (error) {
       console.error(`Failed to send OTP to ${userEmail}:`, error);
@@ -201,6 +213,23 @@ export class VotesService {
       otp += Math.floor(Math.random() * 10); // Random digit from 0 to 9
     }
     return otp;
+  }
+
+  private checkNumber(phone: string): any {
+    if (phone && phone.length > 0) {
+      // Clean and validate the phone number
+      phone = phone.replace(/\s+/g, ''); // Remove spaces
+    
+      const nepalPhoneRegex = /^(?:\+?977|00977|977)?(98[4-6]\d{7}|97[0-8]\d{7}|96[1-2]\d{7})$/;
+    
+      if (nepalPhoneRegex.test(phone)) {
+        // Format the number to a consistent format: +977XXXXXXXXXX
+        phone = phone.replace(/^(?:\+?977|00977|977)?/, '+977');
+        console.log("Phone number is valid", phone);
+      } else {
+        console.error("Invalid phone number. Please ensure it's a valid Nepal number.", phone);
+      }
+    }
   }
 
 
