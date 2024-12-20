@@ -94,18 +94,34 @@ const AdminDashboard = () => {
 
     fetchResults();
   }, []);
+  const multiSelectCategories = [
+    "committeememberopen",
+    "nationalcommitteemember",
+  ];
 
   const gatherWinnersData = () => {
     return results.map((category) => {
       const sortedCandidates = [...category.candidates].sort(
         (a, b) => b.voteCount - a.voteCount
       );
-      const winner = sortedCandidates[0];
-      return {
-        category: categoryNames[category._id] || category._id,
-        winnerName: winner.name,
-        votes: winner.voteCount,
-      };
+
+      if (multiSelectCategories.includes(category._id.toLowerCase())) {
+        const topCandidates = sortedCandidates.slice(0, 5);
+        return {
+          category: categoryNames[category._id] || category._id,
+          winners: topCandidates.map((candidate) => ({
+            name: candidate.name,
+            votes: candidate.voteCount,
+          })),
+        };
+      } else {
+        const winner = sortedCandidates[0];
+        return {
+          category: categoryNames[category._id] || category._id,
+          winnerName: winner.name,
+          votes: winner.voteCount,
+        };
+      }
     });
   };
 
@@ -153,55 +169,95 @@ const AdminDashboard = () => {
                 const sortedCandidates = [...category.candidates].sort(
                   (a, b) => b.voteCount - a.voteCount
                 );
-                const highestVote = sortedCandidates[0]?.voteCount;
+                const topFiveVotes = sortedCandidates
+                  .slice(0, 5)
+                  .map((c) => c.voteCount);
+
                 return (
                   <div key={category._id} className="mb-6">
                     <h3 className="mb-4 text-lg font-bold text-gray-700 border-b pb-2">
                       {categoryNames[category._id] || category._id}
-                      
                     </h3>
                     <div className="space-y-2">
-                      {sortedCandidates.map((candidate) => (
-                        <div
-                          key={candidate.name}
-                          className={`flex flex-col sm:flex-row justify-between md:items-center p-3 rounded-lg ${
-                            candidate.voteCount === highestVote
-                              ? "bg-green-100"
-                              : "bg-gray-50"
-                          }`}
-                        >
-                          <div className="flex items-center gap-4 sm:gap-10">
-                            <Image
-                              src={
-                                candidatePhotos[candidate?.name] ||
-                                "/images/user.png"
-                              }
-                              alt={candidate.name}
-                              width={100}
-                              height={100}
-                              className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full"
-                            />
-                            <span className="text-base sm:text-lg font-semibold text-gray-700">
-                              {candidate.name}
-                            </span>
-                          </div>
-                          {category.candidates.length > 1 ? (
-                            <span
-                              className={`max-sm:text-right text-base  ${
-                                candidate.voteCount === highestVote
-                                  ? "text-red-600 font-bold"
-                                  : "text-gray-900"
+                      {multiSelectCategories.includes(
+                        category._id.toLowerCase()
+                      )
+                        ? sortedCandidates.map((candidate) => {
+                            const isTopFive = topFiveVotes.includes(
+                              candidate.voteCount
+                            );
+
+                            return (
+                              <div
+                                key={candidate.name}
+                                className={`flex flex-col sm:flex-row justify-between md:items-center p-3 rounded-lg ${
+                                  isTopFive ? "bg-green-100" : "bg-gray-50"
+                                }`}
+                              >
+                                <div className="flex items-center gap-4 sm:gap-10">
+                                  <Image
+                                    src={
+                                      candidatePhotos[candidate?.name] ||
+                                      "/images/user.png"
+                                    }
+                                    alt={candidate.name}
+                                    width={100}
+                                    height={100}
+                                    className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full"
+                                  />
+                                  <span className="text-base sm:text-lg font-semibold text-gray-700">
+                                    {candidate.name}
+                                  </span>
+                                </div>
+                                <span
+                                  className={`max-sm:text-right text-base ${
+                                    isTopFive
+                                      ? "text-red-600 font-bold"
+                                      : "text-gray-900"
+                                  }`}
+                                >
+                                  {candidate.voteCount} votes
+                                </span>
+                              </div>
+                            );
+                          })
+                        : sortedCandidates.map((candidate) => (
+                            <div
+                              key={candidate.name}
+                              className={`flex flex-col sm:flex-row justify-between md:items-center p-3 rounded-lg ${
+                                candidate.voteCount ===
+                                sortedCandidates[0].voteCount
+                                  ? "bg-green-100"
+                                  : "bg-gray-50"
                               }`}
                             >
-                              {candidate.voteCount} votes
-                            </span>
-                          ) : (
-                            <span className="max-sm:text-right  text-red-600 font-bold">
-                              Winner
-                            </span>
-                          )}
-                        </div>
-                      ))}
+                              <div className="flex items-center gap-4 sm:gap-10">
+                                <Image
+                                  src={
+                                    candidatePhotos[candidate?.name] ||
+                                    "/images/user.png"
+                                  }
+                                  alt={candidate.name}
+                                  width={100}
+                                  height={100}
+                                  className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full"
+                                />
+                                <span className="text-base sm:text-lg font-semibold text-gray-700">
+                                  {candidate.name}
+                                </span>
+                              </div>
+                              <span
+                                className={`max-sm:text-right text-base ${
+                                  candidate.voteCount ===
+                                  sortedCandidates[0].voteCount
+                                    ? "text-red-600 font-bold"
+                                    : "text-gray-900"
+                                }`}
+                              >
+                                {candidate.voteCount} votes
+                              </span>
+                            </div>
+                          ))}
                     </div>
                   </div>
                 );
@@ -219,42 +275,98 @@ const AdminDashboard = () => {
                     const sortedCandidates = [...category.candidates].sort(
                       (a, b) => b.voteCount - a.voteCount
                     );
-                    const winner = sortedCandidates[0];
+                    const topFiveVotes = sortedCandidates
+                      .slice(0, 5)
+                      .map((c) => c.voteCount);
 
                     return (
-                      <div
-                        key={category._id}
-                        className="flex flex-col sm:flex-row justify-between items-center p-3 border-b last:border-b-0 bg-white rounded-lg"
-                      >
-                        <div className="flex items-center gap-4 sm:gap-10">
-                          <Image
-                            src={
-                              candidatePhotos[winner.name] || "/images/user.png"
-                            }
-                            alt={winner.name}
-                            width={100}
-                            height={100}
-                            className="w-24 h-24 sm:w-32 sm:h-32 rounded-full"
-                          />
-                          <span className="font-semibold text-gray-800 text-base sm:text-lg">
-                            {categoryNames[category._id] || category._id}:{" "}
-                            <span className="ml-2">{winner.name}</span>
-                          </span>
+                      <div key={category._id} className="mb-6">
+                        <h3 className="mb-4 text-lg font-bold text-gray-700 border-b pb-2">
+                          {categoryNames[category._id] || category._id}
+                        </h3>
+                        <div className="space-y-2">
+                          {multiSelectCategories.includes(
+                            category._id.toLowerCase()
+                          ) ? (
+                            sortedCandidates.map((candidate) => {
+                              const isTopFive = topFiveVotes.includes(
+                                candidate.voteCount
+                              ); 
+
+                              return (
+                                <div
+                                  key={candidate.name}
+                                  className={`flex flex-col sm:flex-row justify-between md:items-center p-3 rounded-lg ${
+                                    isTopFive ? "bg-green-100" : "bg-gray-50"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-4 sm:gap-10">
+                                    <Image
+                                      src={
+                                        candidatePhotos[candidate?.name] ||
+                                        "/images/user.png"
+                                      }
+                                      alt={candidate.name}
+                                      width={100}
+                                      height={100}
+                                      className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full"
+                                    />
+                                    <span className="text-base sm:text-lg font-semibold text-gray-700">
+                                      {candidate.name}
+                                    </span>
+                                  </div>
+                                  <span
+                                    className={`max-sm:text-right text-base ${
+                                      isTopFive
+                                        ? "text-red-600 font-bold"
+                                        : "text-gray-900"
+                                    }`}
+                                  >
+                                    {candidate.voteCount} votes
+                                  </span>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <div
+                              key={sortedCandidates[0].name}
+                              className="flex flex-col sm:flex-row justify-between items-center p-3 border-b last:border-b-0 bg-white rounded-lg"
+                            >
+                              <div className="flex items-center gap-4 sm:gap-10">
+                                <Image
+                                  src={
+                                    candidatePhotos[sortedCandidates[0].name] ||
+                                    "/images/user.png"
+                                  }
+                                  alt={sortedCandidates[0].name}
+                                  width={100}
+                                  height={100}
+                                  className="max-[320px]:w-48 w-24 md:w-36 h-24 object-cover rounded-full"
+                                />
+                                <span className="font-semibold text-gray-800 text-xs md:text-lg">
+                                  {categoryNames[category._id] || category._id}:{" "}
+                                  <span className="">
+                                    {sortedCandidates[0].name}
+                                  </span>
+                                </span>
+                              </div>
+                              {category.candidates.length > 1 ? (
+                                <div className="w-full flex flex-col items-end ">
+                                  <span className=" font-bold text-red-600 text-sm md:text-lg  underline">
+                                    Winner
+                                  </span>
+                                  <span className="font-bold text-red-600 text-sm md:text-lg ">
+                                    {sortedCandidates[0].voteCount} votes
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="w-full text-right font-bold text-red-600 text-sm md:text-lg underline">
+                                  Winner
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {category.candidates.length > 1 ? (
-                          <div className="w-full flex flex-col items-end ">
-                            <span className=" font-bold text-red-600 text-lg  underline">
-                              Winner
-                            </span>
-                            <span className="font-bold text-red-600 text-base ">
-                              {winner.voteCount} votes
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="w-full text-right font-bold text-red-600 text-lg sm:text-xl underline">
-                            Winner
-                          </span>
-                        )}
                       </div>
                     );
                   })}
