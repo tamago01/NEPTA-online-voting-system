@@ -17,6 +17,7 @@ class VotesRoutes {
     this.router.get("/get-results", this.votesController.getResults);
     this.router.post("/send-otp",  this.votesController.sendOtp);
     this.router.post("/verify-otp", this.votesController.verifyOtp);
+    this.router.get("/verify-status", this.votesController.verifyStatus);
     
   }
   public getRouter(): Router {

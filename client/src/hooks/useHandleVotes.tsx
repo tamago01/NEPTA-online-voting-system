@@ -131,12 +131,31 @@ export function useHandleVotes() {
       return [];
     }
   };
+  const verifyStatus = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/verify-status`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to verify.");
+      }
+
+      const data = await response.json();
+
+      setResults(data);
+      return data;
+    } catch (err) {
+      console.error("Failed to get results from backend:", err);
+    }
+  };
 
   return {
     postVote,
     getResults,
     sendOtp,
     verifyOtp,
+    verifyStatus,
     response,
     results,
     loading,
