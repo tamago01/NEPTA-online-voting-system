@@ -131,7 +131,10 @@ export function useHandleVotes() {
       return [];
     }
   };
+
   const verifyStatus = async () => {
+    console.log("Verifying status...");
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/votes/verify-status`

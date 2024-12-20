@@ -1,19 +1,32 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
+import { useHandleVotes } from "@/hooks/useHandleVotes";
 import Image from "next/image";
-import Link from "next/link";
 import React, { useState } from "react";
 import banner from "../../images/banner.jpg";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { login, loading, error, success } = useAuth();
+  const { verifyStatus } = useHandleVotes();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
+    const data = await verifyStatus();
+    if (data.data.votingStarted) {
+      await login(email, password);
+    } else {
+      Swal.fire({
+        title: "Nepta",
+        text: data.data.message,
+        icon: "info", // Options: 'success', 'error', 'warning', 'info', 'question'
+        confirmButtonText: "OK",
+      });
+    }
+    console.log("verifyStatus", data.data.votingStarted);
   };
 
   return (
