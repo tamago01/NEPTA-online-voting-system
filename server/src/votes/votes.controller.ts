@@ -10,12 +10,11 @@ export class VotesController {
     this.getResults = this.getResults.bind(this);
     this.sendOtp = this.sendOtp.bind(this);
     this.verifyOtp = this.verifyOtp.bind(this);
+    this.verifyStatus = this.verifyStatus.bind(this);
   }
 
-  
   public async postVote(req: Request, res: Response): Promise<void> {
     try {
-      
       const { votes } = req.body;
       const userEmail = req.user?.email;
       if (!userEmail) {
@@ -85,6 +84,14 @@ export class VotesController {
         req.body.otp
       );
       res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+  public async verifyStatus(req: Request, res: Response) {
+    try {
+      const result = await this.votesService.checkVotingStatus();
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

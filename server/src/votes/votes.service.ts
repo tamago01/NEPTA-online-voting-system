@@ -4,7 +4,6 @@ import { emailService } from "../service/emailProvider";
 import { Candidate } from "./candidate.schema";
 
 export class VotesService {
- 
   public async postVotes(votes: Record<string, string[]>, userEmail: string) {
     try {
       console.log("User Email:", userEmail);
@@ -199,5 +198,23 @@ export class VotesService {
       otp += Math.floor(Math.random() * 10); // Random digit from 0 to 9
     }
     return otp;
+  }
+  public async checkVotingStatus(): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    let votingStatus = false;
+
+    if (votingStatus) {
+      return {
+        success: true,
+        message: "Voting is open. Proceed.",
+      };
+    } else {
+      return {
+        success: false,
+        message: "Voting has not yet started or has ended.",
+      };
+    }
   }
 }
