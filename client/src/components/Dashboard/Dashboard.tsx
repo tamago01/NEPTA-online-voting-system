@@ -6,6 +6,7 @@ import { candidatePhotos } from "../Constants/Photos";
 import OtpModal from "../Otp/OtpModal";
 import { useTimer } from "@/app/context/TimeProvider";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 type CandidateCategories = {
   President: string[];
@@ -138,12 +139,18 @@ const Dashboard = () => {
             ...prev,
             [category]: [...currentSelected, candidate],
           };
+        } else {
+          Swal.fire({
+            title: "Nepta",
+            text: "You can only select a maximum of 5 candidates",
+            icon: "info", // Options: 'success', 'error', 'warning', 'info', 'question'
+            confirmButtonText: "OK",
+            customClass: {
+              popup: "responsive-dialog",
+            },
+          });
+          return prev;
         }
-
-        return {
-          ...prev,
-          [category]: [...currentSelected.slice(1), candidate],
-        };
       }
 
       if (candidates[category].length > 1) {
@@ -222,6 +229,7 @@ const Dashboard = () => {
       await verifyOtp(otp, user?.email);
 
       await postVote(selectedCandidates);
+      console.log("selectedCandidates", selectedCandidates);
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
@@ -254,29 +262,7 @@ const Dashboard = () => {
   }
   return (
     <div className="max-sm:px-6 md:px-12 lg:mt- lg:px-24 py-10 mx-auto">
-      {/* {!showBackdrop && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-lg">
-          {timerValue > 0 ? (
-            <div className="text-center text-white">
-              <h1 className="text-3xl font-bold mb-4">
-                {user?.email === "test@gmail.com" && (
-                  <button
-                    onClick={startTimer}
-                    className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded mb-4"
-                  >
-                    Start Vote
-                  </button>
-                )}
-              </h1>
-              <div>Vote starts in {formatTime(timerValue)}</div>
-              <p className="text-lg">Please wait...</p>
-            </div>
-          ) : (
-            ""
-          )}
-        </div>
-      )} */}
-      <div className="md:px-10 mb-14 w-full border-b py-3 border-gray-300">
+      <div className="md:px-10 mb-14 w-full border-b py-3  border-gray-300">
         <label className=" max-sm:text-[14px] md:text-[24px] font-bold  text-gray-700">
           <a className="text-green-400">Welcome,</a> to the NEPTA election 2024
         </label>
@@ -313,7 +299,7 @@ const Dashboard = () => {
                   )}
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
               {names.map((name) => {
                 const isDisabled = names.length <= 1;
                 const isSelected =
@@ -372,6 +358,11 @@ const Dashboard = () => {
                 );
               })}
             </div>
+            {/* {(category === "CommitteeMemberOpen" ||
+              category === "NationalCommitteeMember") &&
+              category && (
+                <p className="text-red-500 text-sm mt-2">{categoryError}</p>
+              )} */}
           </div>
         ))}
 

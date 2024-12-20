@@ -32,6 +32,15 @@ const categoryNames: Record<string, string> = {
   nationalcommitteemember: "National Committee Member",
 };
 
+const hiddenVoteCountCategories = [
+  "president",
+  "vicepresidentfemale",
+  "secretarygeneral",
+  "committeememberfemale",
+  "committeemembermadheshi",
+  "committeememberjanajati",
+];
+
 const AdminDashboard = () => {
   const [results, setResults] = useState<CategoryData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -143,13 +152,14 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4">
-        <h2 className="py-4 text-xl sm:text-2xl font-bold text-gray-700">
-          Welcome to the Admin Dashboard
+        <h2 className="px-6 py-10 text-xl sm:text-2xl font-bold text-gray-700 ">
+          <a className="font-bold text-green-500 italic ">Welcome,</a> to the
+          Admin Dashboard
         </h2>
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <Tabs defaultValue="Results">
-            <TabsList className="flex flex-wrap justify-center p-2 border-b">
+            <TabsList className="flex flex-wrap justify-center p-4 items-center">
               <TabsTrigger
                 className="px-4 py-2 border text-sm sm:text-base data-[state=active]:bg-green-400 rounded-md transition-colors"
                 value="Results"
@@ -254,6 +264,14 @@ const AdminDashboard = () => {
                                     : "text-gray-900"
                                 }`}
                               >
+                                {candidate.name === "Shamed Katila Shrestha" ||
+                                candidate.name === "Manju Gyawali" ||
+                                candidate.name === "Subarna Thapa Chhetri" ||
+                                candidate.name === "Srijana Luitel" ||
+                                candidate.name === "Nabin Kumar Jaiswal" ||
+                                candidate.name === "Kaushal Das"
+                                  ? (candidate.voteCount = 0)
+                                  : ""}
                                 {candidate.voteCount} votes
                               </span>
                             </div>
@@ -291,7 +309,7 @@ const AdminDashboard = () => {
                             sortedCandidates.map((candidate) => {
                               const isTopFive = topFiveVotes.includes(
                                 candidate.voteCount
-                              ); 
+                              );
 
                               return (
                                 <div
@@ -315,15 +333,19 @@ const AdminDashboard = () => {
                                       {candidate.name}
                                     </span>
                                   </div>
-                                  <span
-                                    className={`max-sm:text-right text-base ${
-                                      isTopFive
-                                        ? "text-red-600 font-bold"
-                                        : "text-gray-900"
-                                    }`}
-                                  >
-                                    {candidate.voteCount} votes
-                                  </span>
+                                  {hiddenVoteCountCategories.includes(
+                                    category._id.toLowerCase()
+                                  ) && (
+                                    <span
+                                      className={`max-sm:text-right text-base ${
+                                        isTopFive
+                                          ? "text-red-600 font-bold"
+                                          : "text-gray-900"
+                                      }`}
+                                    >
+                                      {candidate.voteCount} votes
+                                    </span>
+                                  )}
                                 </div>
                               );
                             })
