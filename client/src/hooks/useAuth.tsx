@@ -51,7 +51,7 @@ export function useAuth() {
         setSuccess(true);
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("authToken", data.user.token);
-
+        
         (async () => {
           await router.push("/dashboard");
         })();
@@ -108,7 +108,7 @@ export function useAuth() {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    router.push("/");
     localStorage.removeItem("authToken");
     window.location.href = "/";
   };
