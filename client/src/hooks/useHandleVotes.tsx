@@ -44,7 +44,7 @@ export function useHandleVotes() {
     }
   };
 
-  const sendOtp = async (email: string) => {
+  const sendOtp = async (email: string,) => {
     try {
       setLoading(true);
       setError(null);

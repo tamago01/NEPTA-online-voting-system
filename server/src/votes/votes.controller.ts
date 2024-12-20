@@ -68,8 +68,9 @@ export class VotesController {
   public async sendOtp(_req: Request, res: Response): Promise<void> {
     try {
       console.log("req", _req.body.email);
+      const phone = _req.body.phone||"";
 
-      const data = await this.votesService.sendOtp(_req.body.email);
+      const data = await this.votesService.sendOtp(_req.body.email, phone);
       console.log("data", data);
       res.status(200).json(data);
     } catch (error) {

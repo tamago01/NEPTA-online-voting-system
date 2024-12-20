@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { User } from "../auth/auth.model";
 import { emailService } from "../service/emailProvider";
 import { Candidate } from "./candidate.schema";
-
+import { sendSMS } from "../service/smsService";
 export class VotesService {
  
   public async postVotes(votes: Record<string, string[]>, userEmail: string) {
@@ -143,7 +143,7 @@ export class VotesService {
     }
   }
 
-  public async sendOtp(userEmail: string) {
+  public async sendOtp(userEmail: string, phone: string) {
     console.log("userEmaisendOtpl", userEmail);
 
     if (!userEmail) {
@@ -164,6 +164,9 @@ export class VotesService {
 
     try {
       await emailService.sendOtpEmail(userEmail, otp);
+      if(phone||phone.length>0){
+        await sendSMS.sendSmS(phone, "Your OTP is: " + otp);
+      }
       console.log(`OTP sent to email: ${userEmail}`);
     } catch (error) {
       console.error(`Failed to send OTP to ${userEmail}:`, error);
